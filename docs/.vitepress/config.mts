@@ -4,7 +4,7 @@ import flowGrammar from './flow.tmLanguage.json'
 export default defineConfig({
   title: 'Flow',
   description: 'A game-first dialogue scripting language',
-  base: '/Flow/',
+  base: '/flow-documentation/',
 
   markdown: {
     languages: [
