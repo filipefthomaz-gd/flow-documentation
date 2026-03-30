@@ -1,0 +1,219 @@
+{
+  "name": "Flow Dialogue",
+  "scopeName": "source.flow",
+  "fileTypes": ["flow", "flo"],
+  "patterns": [
+    { "include": "#comment" },
+    { "include": "#include" },
+    { "include": "#const_def" },
+    { "include": "#root_node" },
+    { "include": "#jump" },
+    { "include": "#narration" },
+    { "include": "#keyword_line" },
+    { "include": "#eod" },
+    { "include": "#return_tokens" },
+    { "include": "#speaker_line" }
+  ],
+  "repository": {
+    "comment": {
+      "match": "//.*$",
+      "name": "comment.line.double-slash.flow"
+    },
+
+    "include": {
+      "match": "(#INCLUDE)\\s+(.+)$",
+      "captures": {
+        "1": { "name": "keyword.control.include.flow" },
+        "2": { "name": "string.unquoted.path.flow" }
+      }
+    },
+
+    "const_def": {
+      "match": "^\\s*(CONST)\\s+(\\w+)\\s*=\\s*(.+)$",
+      "captures": {
+        "1": { "name": "keyword.other.const.flow" },
+        "2": { "name": "variable.other.constant.flow" },
+        "3": { "name": "string.quoted.double.flow" }
+      }
+    },
+
+    "root_node": {
+      "match": "^(<<[A-Z0-9_]+>>)\\s*:?",
+      "captures": {
+        "1": { "name": "entity.name.tag.flow" }
+      }
+    },
+
+    "jump": {
+      "patterns": [
+        {
+          "comment": "Tunnel arrow form: -> NAME <-",
+          "match": "(->)\\s*([A-Za-z0-9_.]+)\\s*(<-)",
+          "captures": {
+            "1": { "name": "keyword.operator.tunnel.flow" },
+            "2": { "name": "entity.name.tag.flow" },
+            "3": { "name": "keyword.operator.tunnel.flow" }
+          }
+        },
+        {
+          "comment": "Hard jump: ->NAME",
+          "match": "(->)([A-Za-z0-9_.]+)",
+          "captures": {
+            "1": { "name": "keyword.operator.jump.flow" },
+            "2": { "name": "entity.name.tag.flow" }
+          }
+        },
+        {
+          "match": "(<<)([A-Z0-9_]+)(>>)",
+          "captures": {
+            "1": { "name": "keyword.operator.jump.flow" },
+            "2": { "name": "entity.name.tag.flow" },
+            "3": { "name": "keyword.operator.jump.flow" }
+          }
+        }
+      ]
+    },
+
+    "narration": {
+      "patterns": [
+        {
+          "match": "^\\s*(>)\\s*(.*)$",
+          "captures": {
+            "1": { "name": "keyword.operator.narration.flow" },
+            "2": { "name": "markup.italic.narration.flow" }
+          }
+        },
+        {
+          "match": "^\\s*(NARRATION)\\s*:\\s*(.*)$",
+          "captures": {
+            "1": { "name": "keyword.operator.narration.flow" },
+            "2": { "name": "markup.italic.narration.flow" }
+          }
+        }
+      ]
+    },
+
+    "eod": {
+      "match": "^\\s*(EOD)\\s*$",
+      "captures": {
+        "1": { "name": "keyword.control.eod.flow" }
+      }
+    },
+
+    "return_tokens": {
+      "match": "^\\s*(<-|<|RETURN|END_INTERRUPTION|\\^-)\\s*$",
+      "captures": {
+        "1": { "name": "keyword.control.return.flow" }
+      }
+    },
+
+    "keyword_line": {
+      "patterns": [
+        {
+          "match": "^\\s*(ONCE|IGNORE)\\s*:?\\s*$",
+          "captures": {
+            "1": { "name": "keyword.control.once.flow" }
+          }
+        },
+        {
+          "match": "^\\s*(TUNNEL)\\s*:\\s*(.+)$",
+          "captures": {
+            "1": { "name": "keyword.control.tunnel.flow" },
+            "2": { "name": "entity.name.tag.flow" }
+          }
+        },
+        {
+          "match": "^\\s*(RANDOM|SHUFFLE|CYCLE)(\\|[^:]*)?\\s*:?\\s*$",
+          "captures": {
+            "1": { "name": "keyword.control.pick.flow" },
+            "2": { "name": "constant.numeric.modifier.flow" }
+          }
+        },
+        {
+          "match": "^\\s*(SIMULTANEOUS)\\s*:?\\s*$",
+          "captures": {
+            "1": { "name": "keyword.control.simultaneous.flow" }
+          }
+        },
+        {
+          "match": "^\\s*(OPTIONS|CHOICES|BRANCHING|\\?)(\\|[^:]*)?\\s*:?\\s*$",
+          "captures": {
+            "1": { "name": "keyword.control.branching.flow" },
+            "2": { "name": "constant.numeric.modifier.flow" }
+          }
+        },
+        {
+          "match": "^\\s*(IF )(.+?)\\s*:?\\s*$",
+          "captures": {
+            "1": { "name": "keyword.control.conditional.flow" },
+            "2": { "name": "meta.condition.flow" }
+          }
+        },
+        {
+          "match": "^\\s*(ELSE IF )(.+?)\\s*:?\\s*$",
+          "captures": {
+            "1": { "name": "keyword.control.conditional.flow" },
+            "2": { "name": "meta.condition.flow" }
+          }
+        },
+        {
+          "match": "^\\s*(ELSE)\\s*:?\\s*$",
+          "captures": {
+            "1": { "name": "keyword.control.conditional.flow" }
+          }
+        },
+        {
+          "match": "^\\s*(PAUSE)\\s*$",
+          "captures": {
+            "1": { "name": "keyword.control.pause.flow" }
+          }
+        },
+        {
+          "match": "^\\s*(CONST)\\s*$",
+          "captures": {
+            "1": { "name": "keyword.other.const.flow" }
+          }
+        }
+      ]
+    },
+
+    "speaker_line": {
+      "comment": "SpeakerName: dialogue text — must come after keyword patterns",
+      "match": "^\\s*(-\\s*)?((?!//|->|<<|CONST|IGNORE|ONCE|TUNNEL|CYCLE|SHUFFLE|RANDOM|SIMULTANEOUS|OPTIONS|CHOICES|BRANCHING|IF |ELSE|EOD|PAUSE|RETURN|END_INTERRUPTION|NARRATION|>)[^:\\[\\]]+?)\\s*:\\s*(.*)$",
+      "captures": {
+        "1": { "name": "punctuation.definition.list.flow" },
+        "2": { "name": "entity.name.function.flow" },
+        "3": {
+          "patterns": [
+            { "include": "#inline_command" },
+            { "include": "#const_ref" },
+            { "include": "#dialogue_text" }
+          ]
+        }
+      }
+    },
+
+    "inline_command": {
+      "match": "(\\[\\[)(\\w+)(\\s+[^\\]]*?)?(\\]\\])",
+      "captures": {
+        "1": { "name": "punctuation.definition.command.begin.flow" },
+        "2": { "name": "support.function.command.flow" },
+        "3": { "name": "string.unquoted.command-args.flow" },
+        "4": { "name": "punctuation.definition.command.end.flow" }
+      }
+    },
+
+    "const_ref": {
+      "match": "\\{\\$(\\w+)\\}",
+      "captures": {
+        "0": { "name": "variable.other.constant.ref.flow" },
+        "1": { "name": "variable.other.constant.flow" }
+      }
+    },
+
+    "dialogue_text": {
+      "match": "[^\\[\\]{}]+",
+      "name": "string.unquoted.dialogue.flow"
+    }
+  }
+}
