@@ -6,6 +6,10 @@ export default defineConfig({
   description: 'A game-first dialogue scripting language',
   base: '/flow-documentation/',
 
+  head: [
+    ['link', { rel: 'icon', type: 'image/png', href: '/flow-documentation/favicon.png' }]
+  ],
+
   markdown: {
     languages: [
       {
