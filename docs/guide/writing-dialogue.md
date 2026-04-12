@@ -173,7 +173,7 @@ ELSE:
   John: We don't know you well enough for this.
 ```
 
-Conditions use the `[[if ...]]` command syntax under the hood, so any expression your runtime evaluates is valid. You can chain as many `ELSE IF` branches as needed. The `ELSE` is optional.
+Conditions use standard comparison and logical operators: `==`, `!=`, `<`, `>`, `<=`, `>=`, `&&`, `||`, `!`. You can chain as many `ELSE IF` branches as needed. The `ELSE` is optional.
 
 ---
 
@@ -193,20 +193,99 @@ SIMULTANEOUS:
 
 Useful for overlaid narration, ambient sound cues, or characters speaking at the same time.
 
+### PARALLEL and KILL
+
+`PARALLEL` starts a root section running in a separate track without pausing the current dialogue. `KILL` stops a running parallel track by name.
+
+```flow
+<<INTRO>>:
+  PARALLEL: AMBIENT_MUSIC
+  Rita: Let's move.
+  John: Right behind you.
+  KILL: AMBIENT_MUSIC
+  EOD
+
+<<AMBIENT_MUSIC>>:
+  > [[audio music_tension_loop]]
+  EOD
+```
+
 ---
 
-## Constants
+## Variables
 
-Define a compile-time constant with `CONST` and reference it with `{$Name}`:
+Flow has three kinds of variables: compile-time constants, persistent variables, and temporaries.
+
+### CONST — compile-time substitution
+
+`CONST` defines a value that is replaced literally in the script text at parse time. Reference it with `$Name` (bare dollar sign, no braces):
 
 ```flow
 CONST PlayerName = "Alex"
 CONST QuestTitle = "The Last Signal"
 
-Rita: Welcome, {$PlayerName}. The mission is called {$QuestTitle}.
+Rita: Welcome, $PlayerName. Your mission is $QuestTitle.
 ```
 
-Constants are substituted during parsing — they are not runtime variables.
+Constants are substituted before the file is parsed — they are not available at runtime.
+
+### VAR — persistent variables
+
+`VAR` declares a persistent variable stored in the runtime's variable storage. Declare at the top level of the file:
+
+```flow
+VAR reputation = 0
+VAR has_key = false
+VAR player_name = "Unknown"
+```
+
+Reference at runtime inside `{braces}`:
+
+```flow
+Rita: Your reputation is {reputation}.
+John: Good to meet you, {player_name}.
+```
+
+Variables persist across scenes for the lifetime of the storage object.
+
+### TEMP — session variables
+
+`TEMP` at the top level works like `VAR` but is reset each session. Inside a block, it creates a node that sets a temporary value mid-dialogue:
+
+```flow
+TEMP visit_count = 0
+
+<<SHOP>>:
+  TEMP visit_count = 1
+  Rita: Welcome back.
+  EOD
+```
+
+### Inline expressions
+
+Inside `{braces}`, you can use more than just a variable name:
+
+```flow
+// Variable substitution
+Rita: You have {gold} coins.
+
+// Ternary: {condition ? trueValue | falseValue}
+Rita: You look {reputation > 5 ? "trustworthy" | "suspicious"}.
+
+// Random pick: {A | B | C}
+John: {Morning|Afternoon|Evening}, traveller.
+```
+
+---
+
+## Constants
+
+See [Variables](#variables) above. The short form:
+
+```flow
+CONST Key = "value"       // define
+$Key                       // reference in text (bare dollar, no braces)
+```
 
 ---
 
@@ -231,6 +310,16 @@ Rita: Let's move. [[audio footsteps_run]] [[tag urgent]]
 John: Get down! [[vfx explosion 1.5]] [[camera_shake 0.3]]
 [[audio ambient_rain]]
 Rita: Did you hear that?
+```
+
+### Shorthands
+
+For common operations there are shorter forms that expand to `[[...]]` at parse time:
+
+```flow
+SET reputation = 1           // expands to [[set reputation = 1]]
+#audio footsteps_run         // expands to [[audio footsteps_run]]
+#vfx explosion 1.5           // expands to [[vfx explosion 1.5]]
 ```
 
 Commands can appear anywhere in the line — before, after, or inline with text. Standalone `[[...]]` lines are processed without a speaker. See [Inline Commands](/reference/commands) for details.

@@ -37,6 +37,7 @@ export default defineConfig({
           { text: 'Sequences',         link: '/guide/sequences' },
           { text: 'Narration',         link: '/guide/narration' },
           { text: 'Tunnel',            link: '/guide/tunnel' },
+          { text: 'Variables',         link: '/guide/variables' },
           { text: 'VS Code Features',  link: '/guide/vscode-features' },
         ],
       },

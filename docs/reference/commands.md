@@ -20,6 +20,37 @@ Multiple commands on the same line are all processed in order.
 
 ---
 
+## Shorthands
+
+Two shorthand forms expand to `[[...]]` at parse time:
+
+### SET shorthand
+
+```flow
+SET reputation = 1           // same as [[set reputation = 1]]
+SET has_key = true
+SET player_name = "Alex"
+```
+
+`SET` followed by anything on the same line becomes `[[set ...]]`. Useful for setting variables without embedding them inside a speaker line.
+
+### # shorthand
+
+```flow
+#audio footsteps_run         // same as [[audio footsteps_run]]
+#vfx explosion 1.5           // same as [[vfx explosion 1.5]]
+#camera_shake 0.3            // same as [[camera_shake 0.3]]
+#tag cutscene                // same as [[tag cutscene]]
+```
+
+Any line starting with `#WORD` (other than `#INCLUDE`) is treated as a command shorthand. The word after `#` becomes the command key; the rest of the line becomes the argument.
+
+::: tip When to use shorthands
+Use `SET` and `#` for standalone commands that aren't part of spoken text. They read more cleanly than a bare `[[...]]` line when the intent is obvious.
+:::
+
+---
+
 ## Built-in commands
 
 | Command | Example | When it runs |

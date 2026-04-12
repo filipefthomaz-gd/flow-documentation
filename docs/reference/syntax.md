@@ -82,6 +82,24 @@ See [Tunnel](/guide/tunnel) for full details.
 
 ---
 
+## Parallel tracks
+
+```flow
+PARALLEL: ROOT_NAME      // start a root section in a parallel track
+KILL: ROOT_NAME          // stop a running parallel track
+```
+
+```flow
+<<SCENE>>:
+  PARALLEL: MUSIC_LOOP
+  Rita: Let's go.
+  John: Right behind you.
+  KILL: MUSIC_LOOP
+  EOD
+```
+
+---
+
 ## Choices
 
 ```flow
@@ -205,7 +223,7 @@ ELSE:
   John: We don't know you.
 ```
 
-`ELSE IF` and `ELSE` are optional.
+`ELSE IF` and `ELSE` are optional. Operators: `==`, `!=`, `<`, `>`, `<=`, `>=`, `&&`, `||`, `!`.
 
 ---
 
@@ -215,7 +233,7 @@ ELSE:
 |-------|-----------|
 | `<` | Nearest enclosing choice list |
 | `<-` or `RETURN` | Parent scope |
-| `END_INTERRUPTION` | Same as `<-` |
+| `^-` or `END_INTERRUPTION` | Same as `<-` |
 
 ---
 
@@ -227,15 +245,59 @@ EOD
 
 ---
 
-## Constants
+## Variables
+
+### CONST — compile-time
 
 ```flow
 CONST PlayerName = "Alex"
 
-Rita: Welcome, {$PlayerName}.
+Rita: Welcome, $PlayerName.      // $Name — bare dollar, substituted at parse time
 ```
 
-Substituted at parse time. Not runtime variables.
+Not available at runtime. Replaced literally in the file text before parsing.
+
+### VAR — persistent
+
+```flow
+VAR reputation = 0
+VAR has_key = false
+```
+
+Declare at the top level. Reference in dialogue with `{braces}`:
+
+```flow
+Rita: Your reputation is {reputation}.
+```
+
+### TEMP — session
+
+```flow
+TEMP visit_count = 0
+```
+
+Like `VAR` but reset each session. Can also appear inside a block to set a value mid-dialogue:
+
+```flow
+<<SHOP>>:
+  TEMP visit_count = 1
+  Rita: Welcome.
+```
+
+### Inline expressions
+
+Inside `{braces}` in any line of text:
+
+```flow
+// Variable
+Rita: You have {gold} coins.
+
+// Ternary: {condition ? trueVal | falseVal}
+Rita: You look {reputation > 5 ? "trusted" | "suspicious"}.
+
+// Random pick: {A | B | C}
+John: {Morning|Afternoon|Evening}, traveller.
+```
 
 ---
 
@@ -257,6 +319,22 @@ John: Did you hear that?
 ```
 
 `[[KEY expression]]` pairs — before, after, inline, or standalone. See [Commands](/reference/commands).
+
+### SET shorthand
+
+```flow
+SET reputation = 1           // expands to [[set reputation = 1]]
+SET has_key = true
+```
+
+### # shorthand
+
+```flow
+#audio footsteps_run         // expands to [[audio footsteps_run]]
+#vfx explosion 1.5           // expands to [[vfx explosion 1.5]]
+```
+
+Any `#WORD` line (other than `#INCLUDE`) is treated as a command shorthand.
 
 ---
 

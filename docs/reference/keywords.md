@@ -9,12 +9,16 @@
 | `IF` | Conditional branch |
 | `ELSE IF` | Additional conditional branch |
 | `ELSE` | Fallback conditional branch |
-| `TUNNEL` | Jump to a root section and automatically return when it ends |
+| `CONDITIONAL` | Alias for an `IF`-style block |
+| `TUNNEL` | Jump to a root section and return when it ends |
+| `PARALLEL` | Start a root section in a separate track |
+| `KILL` | Stop a running parallel track by name |
 | `EOD` | End of dialogue |
 | `RETURN` / `<-` | Return to parent scope |
-| `END_INTERRUPTION` | Same as `<-` |
+| `^-` / `END_INTERRUPTION` | Same as `<-` |
 | `<` | Return to nearest choice list |
 | `PAUSE` | Pause execution (used by runtime integrations) |
+| `IGNORE` | Skip this block entirely |
 
 ## Sequences
 
@@ -32,13 +36,20 @@
 | `>` | Narration shorthand — non-voiced line, no speaker |
 | `NARRATION` | Explicit narration keyword — identical to `>` |
 
+## Variables
+
+| Keyword | Purpose |
+|---------|---------|
+| `CONST` | Define a compile-time text constant, referenced as `$Name` |
+| `VAR` | Declare a persistent runtime variable, referenced as `{name}` |
+| `TEMP` | Declare a session-scoped variable; at top level declares it, inside a block sets it |
+| `SET` | Shorthand for `[[set expr]]` — set a variable inline |
+
 ## Structure
 
 | Keyword | Purpose |
 |---------|---------|
-| `CONST` | Define a compile-time text constant |
 | `#INCLUDE` | Include another Flow file |
-| `IGNORE` | Mark a block to be skipped entirely |
 
 ---
 
@@ -72,8 +83,15 @@ Applied to `OPTIONS` with pipe separators: `OPTIONS|time|flag|flag`
 | `>` | `NARRATION:` |
 | `<` | Return to nearest choice list |
 | `<-` | `RETURN` |
+| `^-` | `END_INTERRUPTION` |
 | `->NAME` | Jump to root `NAME` |
 | `->NAME<-` | Tunnel to root `NAME` and return (arrow form) |
 | `<<NAME>>` | Jump to root `NAME` (block syntax) |
 | `//` | Line comment |
+| `SET expr` | `[[set expr]]` |
+| `#CMD args` | `[[cmd args]]` |
+| `$Name` | CONST substitution — replaced at parse time |
+| `{name}` | Runtime variable substitution |
+| `{a ? b \| c}` | Inline ternary expression |
+| `{A \| B \| C}` | Inline random pick |
 | `Label\|N` | Weighted RANDOM branch label with weight N |
