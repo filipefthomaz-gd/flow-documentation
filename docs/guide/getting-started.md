@@ -80,6 +80,12 @@ dialogue/
 
 ::: info Cross-file jumps
 Use dot notation to jump to a root in an included file: `->rita.RITA_INTRO`
+
+For files with long paths, use `AS` to give them a short alias:
+```flow
+#INCLUDE characters/npc_rita_vasquez.flow AS rita
+```
+Then reference with the alias: `->rita.RITA_INTRO`
 :::
 
 ## Next steps

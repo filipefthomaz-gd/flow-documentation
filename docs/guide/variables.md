@@ -68,6 +68,17 @@ SET has_key = true
 [[set faction = "rebels"]]
 ```
 
+Compound assignment operators modify the current value in place:
+
+```flow
+SET reputation += 1     // add
+SET gold -= cost        // subtract using another variable
+SET damage *= 2         // multiply
+SET health /= 2         // divide
+```
+
+The right-hand side is a full expression — you can use variables, arithmetic, and comparisons.
+
 These are processed by the `set` command handler in your runtime. The built-in `SetCommand` writes directly to `IFlowVariablesStorage`.
 
 ---
@@ -134,6 +145,16 @@ Any expression that doesn't match the above patterns is passed to the expression
 Rita: That's {gold * 2} after the discount.
 John: Score: {kills + assists}.
 ```
+
+The expression evaluator supports full arithmetic (`+`, `-`, `*`, `/`), comparison (`==`, `!=`, `<`, `>`, `<=`, `>=`), logical (`&&`, `||`, `!` / `not`, `and`, `or`), and parentheses for grouping. Operator precedence follows standard rules.
+
+::: tip String concatenation
+`+` between a string and any other type produces a string: `{"Part " + chapter}` gives `"Part 2"`.
+:::
+
+::: info Numbers in output
+Integer-valued numbers are rendered without a decimal point: `{gold * 1.0}` where gold is `10` outputs `10`, not `10.0`.
+:::
 
 ---
 

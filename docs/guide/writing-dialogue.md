@@ -50,10 +50,19 @@ Use `->` to jump to another root node in the same file:
       EOD
 ```
 
-Cross-file jumps use dot notation after `#INCLUDE`:
+Cross-file jumps use dot notation. By default the prefix is the filename without extension:
 
 ```flow
 #INCLUDE npcs/john.flow
+
+<<START>>:
+  ->john.JOHN_INTRO
+```
+
+Use `AS` to give the included file a shorter or more readable prefix:
+
+```flow
+#INCLUDE characters/npc_john_westbrook.flow AS john
 
 <<START>>:
   ->john.JOHN_INTRO
@@ -156,9 +165,9 @@ OPTIONS:
 
 | Token | Returns to |
 |-------|-----------|
-| `<` | Nearest enclosing choice list |
-| `<-` or `RETURN` | Parent scope |
-| `END_INTERRUPTION` | Same as `<-` |
+| `<` | Nearest enclosing `OPTIONS` block — resumes the choice list |
+| `<-` or `RETURN` | Parent scope — returns from a tunnel or ends a branch |
+| `^-` or `END_INTERRUPTION` | Same as `<-` — preferred inside interruption branches |
 
 ---
 
@@ -177,25 +186,13 @@ Conditions use standard comparison and logical operators: `==`, `!=`, `<`, `>`, 
 
 ---
 
-## Simultaneous tracks
+## Parallel tracks
 
-`SIMULTANEOUS` runs multiple branches at the same time. The first branch drives the player's progression:
-
-```flow
-SIMULTANEOUS:
-  - MainTrack:
-    Rita: Keep moving, we're almost there.
-    John: I can hear them behind us.
-  - Ambience:
-    > Rain hammers the rooftop.
-    > Somewhere below, glass breaks.
-```
-
-Useful for overlaid narration, ambient sound cues, or characters speaking at the same time.
+Flow has two ways to run content alongside the main dialogue.
 
 ### PARALLEL and KILL
 
-`PARALLEL` starts a root section running in a separate track without pausing the current dialogue. `KILL` stops a running parallel track by name.
+`PARALLEL` starts a root section in a genuinely independent track — the master dialogue continues immediately without waiting. `KILL` stops a running parallel track by name.
 
 ```flow
 <<INTRO>>:
@@ -209,6 +206,56 @@ Useful for overlaid narration, ambient sound cues, or characters speaking at the
   > [[audio music_tension_loop]]
   EOD
 ```
+
+Use `PARALLEL` for background loops, fire-and-forget sequences, and anything that should run independently over time.
+
+### SIMULTANEOUS
+
+`SIMULTANEOUS` plays multiple branches in sequence with the first branch driving player progression. It is useful for layering narration or ambient lines alongside dialogue within a single flow:
+
+```flow
+SIMULTANEOUS:
+  - MainTrack:
+    Rita: Keep moving, we're almost there.
+    John: I can hear them behind us.
+  - Ambience:
+    > Rain hammers the rooftop.
+    > Somewhere below, glass breaks.
+```
+
+::: warning SIMULTANEOUS is sequential, not concurrent
+All branches are processed one after another in a single pass. For a track that advances independently over real time, use `PARALLEL`.
+:::
+
+### AWAIT
+
+`AWAIT` suspends the current dialogue until something resolves — a parallel track finishing, an external event, or a function returning `true`:
+
+```flow
+<<SCENE>>:
+  PARALLEL: CUTSCENE_ANIM
+  AWAIT: CUTSCENE_ANIM      // resumes automatically when CUTSCENE_ANIM hits EOD
+  Rita: Now let's talk.
+  EOD
+```
+
+See [Parallel Tracks](/guide/parallel-tracks) for the full picture including event and function await variants.
+
+---
+
+## PAUSE
+
+`PAUSE` inserts a timed beat into the dialogue. The runner delivers it like a normal line; your platform handles the actual delay.
+
+```flow
+<<REVEAL>>:
+  John: I know who did it.
+  PAUSE: 1.0
+  John: It was you.
+  EOD
+```
+
+The value is a float in seconds. Advance the dialogue as normal once the delay elapses.
 
 ---
 

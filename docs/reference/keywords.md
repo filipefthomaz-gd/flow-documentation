@@ -17,7 +17,8 @@
 | `RETURN` / `<-` | Return to parent scope |
 | `^-` / `END_INTERRUPTION` | Same as `<-` |
 | `<` | Return to nearest choice list |
-| `PAUSE` | Pause execution (used by runtime integrations) |
+| `PAUSE` | Timed delay — `PAUSE: 1.5` pauses execution for the given number of seconds |
+| `AWAIT` | Suspend execution until a condition resolves — track EOD, external event, or function |
 | `IGNORE` | Skip this block entirely |
 
 ## Sequences
@@ -49,7 +50,7 @@
 
 | Keyword | Purpose |
 |---------|---------|
-| `#INCLUDE` | Include another Flow file |
+| `#INCLUDE` | Include another Flow file — `#INCLUDE path` or `#INCLUDE path AS alias` |
 
 ---
 
@@ -88,7 +89,7 @@ Applied to `OPTIONS` with pipe separators: `OPTIONS|time|flag|flag`
 | `->NAME<-` | Tunnel to root `NAME` and return (arrow form) |
 | `<<NAME>>` | Jump to root `NAME` (block syntax) |
 | `//` | Line comment |
-| `SET expr` | `[[set expr]]` |
+| `SET expr` | `[[set expr]]` — supports `=`, `+=`, `-=`, `*=`, `/=` |
 | `#CMD args` | `[[cmd args]]` |
 | `$Name` | CONST substitution — replaced at parse time |
 | `{name}` | Runtime variable substitution |

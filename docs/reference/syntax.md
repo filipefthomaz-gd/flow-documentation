@@ -100,6 +100,44 @@ KILL: ROOT_NAME          // stop a running parallel track
 
 ---
 
+## AWAIT
+
+Suspends execution until a condition resolves. Three variants:
+
+```flow
+AWAIT: TRACK_NAME        // waits for a parallel track to reach EOD (auto-resolved)
+AWAIT: event_name        // waits for the platform to call ResumeFromAwait()
+AWAIT: IsReady()         // waits until a function returns true
+```
+
+```flow
+<<SCENE>>:
+  PARALLEL: CUTSCENE_ANIM
+  AWAIT: CUTSCENE_ANIM   // resumes when CUTSCENE_ANIM hits EOD
+  Rita: Let's go.
+  EOD
+```
+
+See [Parallel Tracks](/guide/parallel-tracks) for full integration details.
+
+---
+
+## PAUSE
+
+```flow
+PAUSE: 1.5               // timed delay — float value in seconds
+```
+
+```flow
+<<REVEAL>>:
+  John: I know who did it.
+  PAUSE: 1.0
+  John: It was you.
+  EOD
+```
+
+---
+
 ## Choices
 
 ```flow
@@ -308,6 +346,16 @@ John: {Morning|Afternoon|Evening}, traveller.
 #INCLUDE quests/main_quest.flow
 ```
 
+Use `AS` to give an included file a shorter prefix for cross-file references:
+
+```flow
+#INCLUDE characters/npc_rita_vasquez.flow AS rita
+
+<<START>>:
+  ->rita.RITA_INTRO          // without AS this would be ->npc_rita_vasquez.RITA_INTRO
+  TUNNEL: rita.RITA_BARK
+```
+
 ---
 
 ## Inline commands
@@ -325,6 +373,7 @@ John: Did you hear that?
 ```flow
 SET reputation = 1           // expands to [[set reputation = 1]]
 SET has_key = true
+SET reputation += 1          // compound assignment: +=, -=, *=, /=
 ```
 
 ### # shorthand

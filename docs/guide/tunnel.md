@@ -42,7 +42,7 @@ Spaces around the target are optional:
 
 ## Cross-file tunnels
 
-Works the same as cross-file jumps, using dot notation after `#INCLUDE`:
+Works the same as cross-file jumps, using dot notation after `#INCLUDE`. The prefix is the filename without extension, or the alias if `AS` was used:
 
 ```flow
 #INCLUDE npcs/john.flow
@@ -51,6 +51,14 @@ Works the same as cross-file jumps, using dot notation after `#INCLUDE`:
   Rita: Hang on.
   TUNNEL: john.GREETING
   Rita: Right. Let's go.
+  EOD
+```
+
+```flow
+#INCLUDE characters/npc_john_westbrook.flow AS john
+
+<<START>>:
+  TUNNEL: john.GREETING   // same — alias replaces the filename prefix
   EOD
 ```
 

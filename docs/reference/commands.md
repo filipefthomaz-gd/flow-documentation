@@ -34,6 +34,15 @@ SET player_name = "Alex"
 
 `SET` followed by anything on the same line becomes `[[set ...]]`. Useful for setting variables without embedding them inside a speaker line.
 
+Compound assignment operators are also supported:
+
+```flow
+SET reputation += 1          // add
+SET gold -= cost             // subtract, RHS can be a variable or expression
+SET damage *= 2              // multiply
+SET health /= 2              // divide
+```
+
 ### # shorthand
 
 ```flow
