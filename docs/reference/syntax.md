@@ -28,6 +28,26 @@ A Flow file is a plain text file (`.flow` or `.flo`) made up of indented blocks.
 
 Named sections. A file can have one or many. Execution begins at the first root.
 
+### Node metadata
+
+Nodes can carry metadata for tooling, runtime queries, and documentation. Metadata lines start with `@` and go at the start of a node:
+
+```flow
+<<WITH_METADATA>>:
+  @tags: combat, important
+  @author: Filipe
+  @priority: 1
+  ---
+  Rita: This node has metadata.
+  EOD
+
+<<METADATA_ONLY>>:
+  @tags: justTags
+  EOD
+```
+
+Use `---` to separate metadata from the body. If the body starts with a non-metadata line, `---` is optional — the body begins at the first non-`@` line.
+
 ---
 
 ## Speaker lines
@@ -59,6 +79,44 @@ Non-voiced lines with no speaker. `isNarration = true` in the node data. Both fo
 ->ROOT_NAME              // jump to root in this file
 ->filename.ROOT_NAME     // jump to root in an included file
 <<ROOT_NAME>>            // alternative jump syntax
+```
+
+## Find queries
+
+Jump to a node matching a metadata query:
+
+```flow
+-> find(@tag CONTAINS "combat")
+-> find(@priority > 0)
+-> find(@author == "Filipe")
+```
+
+The first node whose metadata matches the query is selected. Queries use the same expression evaluator as conditions.
+
+---
+
+## Waypoints
+
+Named jump targets within a root node:
+
+```flow
+<<INTERROGATION>>:
+  Guard: State your business.
+  ::retry
+  Guard: That answer isn't good enough. Try again.
+  ?:
+    Lie again:
+      ->retry
+    Tell the truth:
+      ->CLEARED
+  EOD
+```
+
+```flow
+::name                  // declare waypoint
+->name                  // jump within current root
+->ROOT:name             // jump to waypoint in another root
+->file.ROOT:name        // jump to waypoint in another file
 ```
 
 ---
@@ -179,6 +237,22 @@ OPTIONS|5.0|C:      // continue main dialogue while timer runs
 OPTIONS|5.0|C|I:    // continue and interrupt abruptly on selection
 ```
 
+### Conditional options
+
+Filter options or sequence branches with inline `[[if condition]]` in the label:
+
+```flow
+?:
+  - Friendly [[if $mood > 5]]:
+    Rita: Good to see you!
+  - Neutral [[if $mood > 0]]:
+    Rita: Hello.
+  - Hostile [[if $mood <= 0]]:
+    Rita: What do you want?
+```
+
+For `OPTIONS`/`?`, filtering happens at parse time. For `RANDOM`/`CYCLE`/`SHUFFLE`, conditions are re-evaluated each visit.
+
 ---
 
 ## Sequences
@@ -232,6 +306,31 @@ ONCE:
 ```
 
 Plays the block on first visit. Silently skipped on all subsequent visits.
+
+### VISITS — branch by visit count
+
+```flow
+<<GUARD>>:
+  VISITS:
+    1:
+       Guard: First time?
+    2:
+       Guard: Back again?
+    3-5:
+       Guard: Getting to be a habit.
+    +:
+       Guard: You know the drill.
+  EOD
+```
+
+| Branch | Behaviour |
+|--------|-----------|
+| `1:` | Exactly on visit 1 |
+| `2:` | Exactly on visit 2 |
+| `3-5:` | Visits 3 through 5 |
+| `+:` | All subsequent visits |
+
+`ONCE` is equivalent to `VISITS` with only a `1:` branch.
 
 ---
 

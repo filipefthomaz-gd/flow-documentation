@@ -54,6 +54,63 @@ Flow has built-in sequence types so you can write natural-feeling variation with
 
 The `ONCE` block plays only on the first visit. The `CYCLE` block rotates through its lines on subsequent visits. See [Sequences](/guide/sequences) for the full picture.
 
+## Variables and inline expressions
+
+Flow supports variables and inline expressions for dynamic content:
+
+```flow
+VAR playerName = "Stranger"
+VAR gold = 0
+VAR reputation = 0
+
+<<MARKET>>:
+  Rita: Welcome, {playerName}. Good to see you.
+  Rita: You're carrying {gold} gold pieces.
+  Rita: Around here, you're known as {reputation > 5 ? "a friend" | "an outsider"}.
+  Rita: I've got {Apples | Bread | Dried Meat} fresh in today.
+  -> REPUTATION_CHECK
+  EOD
+
+<<REPUTATION_CHECK>>:
+  Guard: You look like {reputation >= 3 ? "someone I can trust" | "trouble"}, {playerName}.
+  EOD
+```
+
+::: tip Inline expressions
+- `{varName}` — replaced with the variable's value at display time
+- `{condition ? trueVal | falseVal}` — inline ternary
+- `{A | B | C}` — inline random pick from the options
+:::
+
+## Parallel tracks and await
+
+Run dialogue in parallel and synchronize with await:
+
+```flow
+<<STAKEOUT>>:
+  Rita: Watch the door. I'll be on comms.
+  PARALLEL: GUARD_PATROL
+  Rita: Stay low.
+  John: Copy that.
+  // Block here until GUARD_PATROL finishes its route.
+  AWAIT: GUARD_PATROL
+  Rita: He's gone. Move now.
+  EOD
+
+<<GUARD_PATROL>>:
+  Guard: Sector one, clear.
+  Guard: Sector two, clear.
+  Guard: All quiet. Returning to post.
+  EOD
+```
+
+::: tip Await variants
+- `AWAIT: TrackName` — wait until the named PARALLEL track reaches EOD
+- `AWAIT: 2.5` — wait N seconds (no platform event needed)
+- `AWAIT: EventName` — suspend until the platform calls ResumeFromAwait()
+- `AWAIT: IsReady()` — suspend until platform function returns true
+:::
+
 ## Project structure
 
 Flow files can be split across multiple files using `#INCLUDE`:
@@ -92,5 +149,6 @@ Then reference with the alias: `->rita.RITA_INTRO`
 
 - [Writing Dialogue](/guide/writing-dialogue) — the full language guide
 - [Sequences](/guide/sequences) — ONCE, CYCLE, SHUFFLE, weighted RANDOM
+- [Parallel Tracks](/guide/parallel-tracks) — PARALLEL, AWAIT, KILL, SIMULTANEOUS
 - [Narration](/guide/narration) — stage directions and narrator lines
 - [Syntax Reference](/reference/syntax) — complete syntax listing

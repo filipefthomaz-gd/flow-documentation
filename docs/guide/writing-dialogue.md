@@ -34,6 +34,28 @@ Root nodes are named sections of dialogue. They act as jump targets and appear i
 
 Root names are uppercase by convention, but not required.
 
+### Node metadata
+
+Root nodes can carry metadata for tooling, runtime queries, and documentation. Metadata lines start with `@` and go at the start of a node:
+
+```flow
+<<WITH_METADATA>>:
+  @tags: combat, important
+  @author: Filipe
+  @priority: 1
+  ---
+  Rita: This node has metadata.
+  EOD
+
+<<NATURAL_END>>:
+  @tags: a, b
+  @when: mood > 5
+  Bob: This ends naturally — no --- needed.
+  EOD: EOD
+```
+
+Use `---` to separate metadata from body content. If the body starts with a non-metadata line, `---` is optional — the body begins at the first non-`@` line. Metadata can be queried at runtime using [Find Queries](#find-queries).
+
 ---
 
 ## Jumping between roots
@@ -70,6 +92,33 @@ Use `AS` to give the included file a shorter or more readable prefix:
 
 You can also use the block syntax as a jump: `<<ROOT_NAME>>` on its own line.
 
+### Find queries
+
+Jump to a node by querying its metadata at runtime:
+
+```flow
+<<START>>:
+  Rita: Let's find a combat scene!
+  -> find(@tag CONTAINS "combat")
+  EOD
+
+<<SCENE_A>>:
+  @tag: combat, action
+  @zone: forest
+  ---
+  Alice: You're in the forest combat area!
+  EOD
+
+<<SCENE_B>>:
+  @tag: peaceful, exploration
+  @zone: forest
+  ---
+  Bob: The peaceful forest path.
+  EOD
+```
+
+The first node whose metadata matches the query is selected as the jump target. The query uses the same expression evaluator as conditions — supports `==`, `!=`, `<`, `>`, `CONTAINS`, and logical operators.
+
 ### Tunnel — jump and return
 
 To jump to a section and automatically return when it ends, use `TUNNEL:`:
@@ -89,6 +138,58 @@ To jump to a section and automatically return when it ends, use `TUNNEL:`:
 Arrow shorthand: `-> ROOT_NAME <-`
 
 See [Tunnel](/guide/tunnel) for full details including cross-file tunnels and nesting.
+
+---
+
+## Waypoints
+
+Waypoints are named jump targets **within** a root node. Use them to mark specific positions and jump back to them without creating a new root.
+
+```flow
+<<INTERROGATION>>:
+  Guard: State your business.
+  ::retry
+  Guard: That answer isn't good enough. Try again.
+  ?:
+    Tell the truth:
+      Guard: Finally. Go ahead.
+      ->CLEARED
+    Lie again:
+      Guard: I'm losing patience.
+      ->retry
+    Say nothing:
+      Guard: We'll be here all night then.
+      ->retry
+  EOD: EOD
+```
+
+### Syntax
+
+| Token | Behaviour |
+|-------|-----------|
+| `::name` | Declare a waypoint at the current position |
+| `->name` | Jump to a waypoint in the current root (checked before root nodes) |
+| `->ROOT:name` | Jump to a waypoint in a different root, same file |
+| `->file.ROOT:name` | Jump to a waypoint in a different file |
+
+```flow
+<<LOOP_EXAMPLE>>:
+  Guard: Let's start over from the top.
+  ->INTERROGATION:retry
+  EOD: EOD
+```
+
+### Cross-file waypoints
+
+Dot notation works for waypoints too — reference the file prefix, root name, and waypoint:
+
+```flow
+#include guards.flow
+
+<<START>>:
+  ->guards.INTERROGATION:retry
+  EOD
+```
 
 ---
 
@@ -169,6 +270,50 @@ OPTIONS:
 | `<-` or `RETURN` | Parent scope — returns from a tunnel or ends a branch |
 | `^-` or `END_INTERRUPTION` | Same as `<-` — preferred inside interruption branches |
 
+### Conditional options with inline [[if]]
+
+Options and sequence branches can include an inline `[[if condition]]` in the label to show or hide them based on a condition:
+
+```flow
+<<OPTIONS_TEST>>:
+  Rita: Choose an option.
+  ?:
+    - Friendly [[if $mood > 5]]:
+      Rita: Good to see you!
+    - Neutral [[if $mood > 0]]:
+      Rita: Hello.
+    - Hostile [[if $mood <= 0]]:
+      Rita: What do you want?
+  SET mood = 3
+  EOD: EOD
+```
+
+For `OPTIONS`/`?`, the filtering happens at parse time (once per dialogue start). For `RANDOM`, `CYCLE`, and `SHUFFLE`, the condition is re-evaluated each visit:
+
+```flow
+<<RANDOM_TEST>>:
+  RANDOM:
+    - Greeting [[if $mood > 5]]:
+      Rita: Great to see you!
+    - Neutral [[if $mood > 0]]:
+      Rita: Hello.
+    - Grumpy [[if $mood <= 0]]:
+      Rita: ...hi.
+  EOD: EOD
+
+<<CYCLE_TEST>>:
+  CYCLE:
+    - Morning [[if $time == "morning"]]:
+      Rita: Good morning!
+    - Afternoon [[if $time == "afternoon"]]:
+      Rita: Good afternoon.
+    - Evening [[if $time == "evening"]]:
+      Rita: Good evening.
+    - AnyTime:
+      Rita: Hello there.
+  EOD: EOD
+```
+
 ---
 
 ## Conditions
@@ -183,6 +328,62 @@ ELSE:
 ```
 
 Conditions use standard comparison and logical operators: `==`, `!=`, `<`, `>`, `<=`, `>=`, `&&`, `||`, `!`. You can chain as many `ELSE IF` branches as needed. The `ELSE` is optional.
+
+---
+
+## VISITS — branch by visit count
+
+`VISITS` plays a different branch depending on how many times the current node has been visited. Visit count is persisted across sessions.
+
+```flow
+<<GUARD_GREETING>>:
+  VISITS:
+    1:
+      Guard: Haven't seen you before. State your business.
+    2:
+      Guard: You again. What is it this time?
+    3-5:
+      Guard: Getting to be a habit, isn't it.
+    +:
+      Guard: Move along. You know the drill.
+  EOD: EOD
+```
+
+### Syntax
+
+| Branch | Behaviour |
+|--------|-----------|
+| `1:` | Plays exactly on visit 1 |
+| `2:` | Plays exactly on visit 2 |
+| `3-5:` | Plays for visits 3 through 5 (range) |
+| `+:` | All subsequent visits (sticky fallback) |
+
+### VISITS with nested content
+
+Branches can contain any valid content — choices, conditions, sequences, and nested blocks:
+
+```flow
+<<SHOP>>:
+  VISITS:
+    1:
+      Rita: First time in the shop? Take a look around.
+      Rita: I get new stock every few days.
+    2:
+      RANDOM:
+        - WelcomeBack1:
+          Rita: Back already?
+        - WelcomeBack2:
+          Rita: Good timing — just restocked.
+    +:
+      Rita: What can I do for you?
+  EOD: EOD
+```
+
+If no branch matches and there is no `+:` branch, the block is silently skipped.
+
+::: tip ONCE vs VISITS
+`ONCE` is equivalent to `VISITS` with only a `1:` branch. Use `VISITS` when you need more than two states (first, second, frequent).
+:::
 
 ---
 
@@ -209,6 +410,63 @@ Flow has two ways to run content alongside the main dialogue.
 
 Use `PARALLEL` for background loops, fire-and-forget sequences, and anything that should run independently over time.
 
+### Parallel tracks with AWAIT
+
+Use `AWAIT` to synchronize the main dialogue with a parallel track. The main dialogue will pause at the await point until the parallel track completes.
+
+```flow
+<<STAKEOUT>>:
+  Rita: Watch the door. I'll be on comms.
+  PARALLEL: GUARD_PATROL
+  Rita: Stay low.
+  John: Copy that.
+  // Block here until GUARD_PATROL finishes its route.
+  AWAIT: GUARD_PATROL
+  Rita: He's gone. Move now.
+  EOD
+
+<<GUARD_PATROL>>:
+  Guard: Sector one, clear.
+  Guard: Sector two, clear.
+  Guard: All quiet. Returning to post.
+  EOD
+```
+
+### Await with events and functions
+
+You can also await external events or platform functions:
+
+```flow
+<<STAKEOUT_WITH_EVENTS>>:
+  Rita: Signal me when you're in position.
+  PARALLEL: AMBIENT_RADIO
+  // Wait for a named event fired by the platform (e.g. player trigger).
+  AWAIT: player_in_position
+  Rita: Good. Beginning the distraction.
+  KILL: AMBIENT_RADIO
+  EOD
+
+<<STAKEOUT_WITH_FUNCTION>>:
+  Rita: Hold on...
+  // Platform polls IsLockPicked() each tick and calls ResumeFromAwait when true.
+  AWAIT: IsLockPicked()
+  Rita: Nice work. Let's go.
+  EOD
+```
+
+### Await with time delays
+
+Await can also be used for simple time delays without needing platform events:
+
+```flow
+<<STAKEOUT_PAUSE>>:
+  Rita: Give it a moment.
+  // AWAIT with a float becomes a PauseNode — no platform event needed.
+  AWAIT: 2.5
+  Rita: Okay. Now.
+  EOD
+```
+
 ### SIMULTANEOUS
 
 `SIMULTANEOUS` plays multiple branches in sequence with the first branch driving player progression. It is useful for layering narration or ambient lines alongside dialogue within a single flow:
@@ -226,6 +484,24 @@ SIMULTANEOUS:
 ::: warning SIMULTANEOUS is sequential, not concurrent
 All branches are processed one after another in a single pass. For a track that advances independently over real time, use `PARALLEL`.
 :::
+
+### END_INTERRUPTION in SIMULTANEOUS
+
+Use `END_INTERRUPTION` (or `^-`) to end a SIMULTANEOUS branch early:
+
+```flow
+<<INTERRUPTION_TEST>>:
+  John: I was going to say—
+  SIMULTANEOUS:
+    - Main:
+      John: Actually, never mind.
+    - Side:
+      Rita: Wait, finish your thought.
+      END_INTERRUPTION
+  EOD: EOD
+```
+
+`END_INTERRUPTION` signals that the interruption branch is done, allowing the main branch to continue alone.
 
 ### AWAIT
 

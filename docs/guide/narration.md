@@ -31,6 +31,91 @@ Both produce the same node. Use whichever reads more naturally in context — `>
   Rita: This is the place.
   John: Are you sure?
   Rita: No.
+  NARRATION: A cold wind moves through the room.
+  EOD: EOD
+```
+
+### Guard post scene with combined features
+
+```flow
+<<GUARD_POST>>:
+  ONCE:
+    > A guard steps out of the shadows.
+    John: New face. State your business.
+    OPTIONS:
+      - I'm here to see Rita:
+        John: She's expecting you?
+        IF hasInvite:
+          John: Go ahead.
+          ->INSIDE
+        ELSE:
+          John: Wait here.
+          ->WAIT
+      - Just passing through:
+        John: Sure you are.
+        <
+      - SILENCE:
+        John: No answer. Interesting.
+  SHUFFLE:
+    Patrol1:
+      John: Eyes open, $PlayerName.
+    Patrol2:
+      John: Quiet night.
+    Patrol3:
+      John: Don't cause trouble.
+  EOD: EOD
+
+<<WAIT>>:
+  > The minutes stretch on.
+  CYCLE:
+    - Wait1:
+      John: She'll be out soon.
+    - Wait2:
+      John: Any minute now.
+    - Wait3:
+      John: These things take time.
+  EOD: EOD
+
+<<INSIDE>>:
+  > The door opens onto a dimly lit room.
+  Rita: $PlayerName. You actually came.
+  Rita: [[emotion relieved]] I wasn't sure you would.
+  OPTIONS:
+    - Of course I came:
+      Rita: Good. We have a lot to discuss.
+    - I almost didn't:
+      Rita: I know. Sit down anyway.
+  EOD: EOD
+```
+
+### Internal monologue
+
+```flow
+Rita: I'll look into it.
+> She won't. She already knows the answer.
+John: Thank you, Rita.
+```
+
+### Stage directions mixed with dialogue
+
+```flow
+<<CONFRONTATION>>:
+  > John turns slowly. He doesn't look surprised.
+  John: I wondered when you'd show up.
+  > He gestures to a chair. You don't sit.
+  John: Still stubborn. Good.
+```
+
+### With choices
+
+```flow
+OPTIONS:
+  - Open the door:
+    > The hinges groan. Whatever was in here hasn't moved in years.
+    Rita: Hello?
+  - Walk away:
+    > You tell yourself you'll come back. You won't.
+    ->STREET
 ```
 
 ### Internal monologue

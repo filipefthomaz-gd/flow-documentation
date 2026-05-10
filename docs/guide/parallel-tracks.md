@@ -20,6 +20,8 @@ There are two mechanisms:
 
 `PARALLEL` starts a root section in a separate track without pausing the current dialogue. The master track continues immediately; the slave runs independently.
 
+### Basic PARALLEL and KILL
+
 ```flow
 <<SCENE>>:
   PARALLEL: AMBIENT_MUSIC
@@ -35,6 +37,27 @@ There are two mechanisms:
 ```
 
 The slave track starts when `PARALLEL` is reached and keeps running while the master plays through Rita and John's lines. `KILL` stops it.
+
+### PARALLEL with ambient chatter
+
+```flow
+<<STREET_SCENE>>:
+  > The street is empty. Almost.
+  PARALLEL: AMBIENT_CHATTER
+  Rita: We need to move fast.
+  John: Agreed. Which way?
+  Rita: Left. Always left.
+  KILL: AMBIENT_CHATTER
+  Rita: Did you hear that?
+  EOD: EOD
+
+<<AMBIENT_CHATTER>>:
+  > Distant voices filter through the fog.
+  Guard: Sector clear.
+  Guard: Keep your eyes open.
+  Guard: Nothing moves in this district after dark.
+  EOD: EOD
+```
 
 ### How it works in the runtime
 
@@ -142,6 +165,56 @@ runner.OnAwaitReached += awaitNode =>
         () => runner.ResumeFromAwait()
     ));
 };
+```
+
+### AWAIT with stakeout examples
+
+More complex await patterns from the samples:
+
+```flow
+<<STAKEOUT>>:
+  Rita: Watch the door. I'll be on comms.
+  PARALLEL: GUARD_PATROL
+  Rita: Stay low.
+  John: Copy that.
+  // Block here until GUARD_PATROL finishes its route.
+  AWAIT: GUARD_PATROL
+  Rita: He's gone. Move now.
+  EOD: EOD
+
+<<STAKEOUT_WITH_EVENTS>>:
+  Rita: Signal me when you're in position.
+  PARALLEL: AMBIENT_RADIO
+  // Wait for a named event fired by the platform (e.g. player trigger).
+  AWAIT: player_in_position
+  Rita: Good. Beginning the distraction.
+  KILL: AMBIENT_RADIO
+  EOD: EOD
+
+<<STAKEOUT_WITH_FUNCTION>>:
+  Rita: Hold on...
+  // Platform polls IsLockPicked() each tick and calls ResumeFromAwait when true.
+  AWAIT: IsLockPicked()
+  Rita: Nice work. Let's go.
+  EOD: EOD
+
+<<STAKEOUT_PAUSE>>:
+  Rita: Give it a moment.
+  // AWAIT with a float becomes a PauseNode — no platform event needed.
+  AWAIT: 2.5
+  Rita: Okay. Now.
+  EOD: EOD
+
+<<GUARD_PATROL>>:
+  Guard: Sector one, clear.
+  Guard: Sector two, clear.
+  Guard: All quiet. Returning to post.
+  EOD: EOD
+
+<<AMBIENT_RADIO>>:
+  > Static crackles on the frequency.
+  > A distant voice reads out coordinates.
+  EOD: EOD
 ```
 
 ::: info AWAIT: float is a PAUSE

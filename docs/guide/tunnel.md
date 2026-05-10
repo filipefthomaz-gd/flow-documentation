@@ -20,6 +20,21 @@ The player sees:
 2. John's greeting + Rita's vouching
 3. Rita's "Where were we?" — execution returned automatically when `JOHN_INTRO` hit `EOD`
 
+### Guard post example with arrow shorthand
+
+```flow
+<<GUARD_POST>>:
+  > The guard post is quiet tonight.
+  ->JOHN_INTRO<-
+  John: Back to your post.
+  EOD: EOD
+
+<<JOHN_INTRO>>:
+  John: Hey. Name's John.
+  Rita: He's with me.
+  EOD: EOD
+```
+
 ---
 
 ## Syntax
