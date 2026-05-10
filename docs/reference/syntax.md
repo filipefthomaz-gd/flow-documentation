@@ -8,9 +8,9 @@ A Flow file is a plain text file (`.flow` or `.flo`) made up of indented blocks.
 <<ROOT_NAME>>:
   SpeakerName: dialogue text
   KEYWORD:
-    - Option A:
+    Option A:
       ...
-    - Option B:
+    Option B:
       ...
 ```
 
@@ -115,8 +115,8 @@ Named jump targets within a root node:
 ```flow
 ::name                  // declare waypoint
 ->name                  // jump within current root
-->ROOT:name             // jump to waypoint in another root
-->file.ROOT:name        // jump to waypoint in another file
+->ROOT|name             // jump to waypoint in another root
+->file.ROOT|name        // jump to waypoint in another file
 ```
 
 ---
@@ -200,14 +200,14 @@ PAUSE: 1.5               // timed delay — float value in seconds
 
 ```flow
 OPTIONS:
-  - Ask about the mission:
+  Ask about the mission:
     Rita: It's dangerous, but necessary.
     <
-  - *Locked option:
+  *Locked option:
     Rita: You can't ask that yet.
-  - #HiddenOption:
+  #HiddenOption:
     Rita: How did you know to ask that?
-  - SILENCE:
+  SILENCE:
     John: Nothing to say, huh.
 ```
 
@@ -226,9 +226,9 @@ Also accepted: `CHOICES:`, `BRANCHING:`, `?:`
 
 ```flow
 OPTIONS|5.0:
-  - Grab the key:
+  Grab the key:
     Rita: Just in time.
-  - SILENCE:
+  SILENCE:
     John: Too slow.
 ```
 
@@ -243,11 +243,11 @@ Filter options or sequence branches with inline `[[if condition]]` in the label:
 
 ```flow
 ?:
-  - Friendly [[if $mood > 5]]:
+  Friendly [[if $mood > 5]]:
     Rita: Good to see you!
-  - Neutral [[if $mood > 0]]:
+  Neutral [[if $mood > 0]]:
     Rita: Hello.
-  - Hostile [[if $mood <= 0]]:
+  Hostile [[if $mood <= 0]]:
     Rita: What do you want?
 ```
 
@@ -261,18 +261,18 @@ For `OPTIONS`/`?`, filtering happens at parse time. For `RANDOM`/`CYCLE`/`SHUFFL
 
 ```flow
 RANDOM:
-  - Rita: Careful out there.
-  - Rita: Stay sharp.
-  - Rita: Eyes open.
+  Rita: Careful out there.
+  Rita: Stay sharp.
+  Rita: Eyes open.
 ```
 
 Picks at random each time. Can repeat. Append `|N` to a branch label for weighted probability:
 
 ```flow
 RANDOM:
-  - Common|3:
+  Common|3:
     Rita: Careful out there.
-  - Rare:
+  Rare:
     Rita: Stay sharp.
 ```
 
@@ -280,9 +280,9 @@ RANDOM:
 
 ```flow
 SHUFFLE:
-  - John: I heard something last night.
-  - John: The generator's acting up again.
-  - John: Don't trust the new arrivals.
+  John: I heard something last night.
+  John: The generator's acting up again.
+  John: Don't trust the new arrivals.
 ```
 
 Non-repeating random. Draws from a shuffled deck; reshuffles when exhausted.
@@ -291,9 +291,9 @@ Non-repeating random. Draws from a shuffled deck; reshuffles when exhausted.
 
 ```flow
 CYCLE:
-  - Rita: Morning.
-  - Rita: Good afternoon.
-  - Rita: Evening again already?
+  Rita: Morning.
+  Rita: Good afternoon.
+  Rita: Evening again already?
 ```
 
 Cycles in order, round-robin.
@@ -338,10 +338,10 @@ Plays the block on first visit. Silently skipped on all subsequent visits.
 
 ```flow
 SIMULTANEOUS:
-  - MainTrack:
+  MainTrack:
     Rita: Keep moving.
     John: I can hear them.
-  - Ambience:
+  Ambience:
     > Rain hammers the rooftop.
 ```
 

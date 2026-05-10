@@ -14,13 +14,13 @@ Create a file called `intro.flow`:
 <<INTRO>>:
   Rita: Hey. Haven't seen you around here before.
   OPTIONS:
-    - Just passing through:
+    Just passing through:
       Rita: Sure you are. Everyone says that.
       ->INTRO
-    - I'm looking for someone:
+    I'm looking for someone:
       Rita: Aren't we all.
       ->SEARCH
-    - Goodbye:
+    Goodbye:
       Rita: Take care of yourself.
       EOD
 
@@ -45,9 +45,9 @@ Flow has built-in sequence types so you can write natural-feeling variation with
   ONCE:
     Rita: First time here? Let me show you around.
   CYCLE:
-    - Rita: Morning.
-    - Rita: Good to see you again.
-    - Rita: Back already?
+    Rita: Morning.
+    Rita: Good to see you again.
+    Rita: Back already?
   Rita: What can I do for you?
   EOD
 ```

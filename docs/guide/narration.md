@@ -43,7 +43,7 @@ Both produce the same node. Use whichever reads more naturally in context — `>
     > A guard steps out of the shadows.
     John: New face. State your business.
     OPTIONS:
-      - I'm here to see Rita:
+      I'm here to see Rita:
         John: She's expecting you?
         IF hasInvite:
           John: Go ahead.
@@ -51,10 +51,10 @@ Both produce the same node. Use whichever reads more naturally in context — `>
         ELSE:
           John: Wait here.
           ->WAIT
-      - Just passing through:
+      Just passing through:
         John: Sure you are.
         <
-      - SILENCE:
+      SILENCE:
         John: No answer. Interesting.
   SHUFFLE:
     Patrol1:
@@ -68,11 +68,11 @@ Both produce the same node. Use whichever reads more naturally in context — `>
 <<WAIT>>:
   > The minutes stretch on.
   CYCLE:
-    - Wait1:
+    Wait1:
       John: She'll be out soon.
-    - Wait2:
+    Wait2:
       John: Any minute now.
-    - Wait3:
+    Wait3:
       John: These things take time.
   EOD: EOD
 
@@ -81,9 +81,9 @@ Both produce the same node. Use whichever reads more naturally in context — `>
   Rita: $PlayerName. You actually came.
   Rita: [[emotion relieved]] I wasn't sure you would.
   OPTIONS:
-    - Of course I came:
+    Of course I came:
       Rita: Good. We have a lot to discuss.
-    - I almost didn't:
+    I almost didn't:
       Rita: I know. Sit down anyway.
   EOD: EOD
 ```
@@ -110,10 +110,10 @@ John: Thank you, Rita.
 
 ```flow
 OPTIONS:
-  - Open the door:
+  Open the door:
     > The hinges groan. Whatever was in here hasn't moved in years.
     Rita: Hello?
-  - Walk away:
+  Walk away:
     > You tell yourself you'll come back. You won't.
     ->STREET
 ```
@@ -142,10 +142,10 @@ Narration works anywhere in the flow, including inside choice branches:
 
 ```flow
 OPTIONS:
-  - Open the door:
+  Open the door:
     > The hinges groan. Whatever was in here hasn't moved in years.
     Rita: Hello?
-  - Walk away:
+  Walk away:
     > You tell yourself you'll come back. You won't.
     ->STREET
 ```

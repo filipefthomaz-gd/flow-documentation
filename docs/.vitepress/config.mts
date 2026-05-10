@@ -38,6 +38,8 @@ export default defineConfig({
           { text: 'Narration',         link: '/guide/narration' },
           { text: 'Tunnel',            link: '/guide/tunnel' },
           { text: 'Parallel Tracks',   link: '/guide/parallel-tracks' },
+          { text: 'Node Metadata',     link: '/guide/metadata' },
+          { text: 'Find Queries',      link: '/guide/find-queries' },
           { text: 'Variables',         link: '/guide/variables' },
           { text: 'VS Code Features',  link: '/guide/vscode-features' },
         ],

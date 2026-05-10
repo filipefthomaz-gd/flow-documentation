@@ -249,10 +249,10 @@ Use `PAUSE` for a simple timed beat. Use `AWAIT` when the delay depends on somet
 
 ```flow
 SIMULTANEOUS:
-  - MainTrack:
+  MainTrack:
     Rita: Keep moving — we're almost there.
     John: I can hear them behind us.
-  - Ambience:
+  Ambience:
     > Rain hammers the rooftop.
     > Somewhere below, glass breaks.
 ```
@@ -314,11 +314,11 @@ Both branches run to completion in a single pass. The first branch (`MainTrack`)
 ```flow
 <<RAID>>:
   SIMULTANEOUS:
-    - Dialogue:
+    Dialogue:
       Rita: Breach on three.
       John: Ready.
       Rita: Three.
-    - Scene:
+    Scene:
       > Smoke drifts through the corridor.
       > Somewhere a fire alarm begins to wail.
 ```

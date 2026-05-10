@@ -36,25 +36,21 @@ Root names are uppercase by convention, but not required.
 
 ### Node metadata
 
-Root nodes can carry metadata for tooling, runtime queries, and documentation. Metadata lines start with `@` and go at the start of a node:
+Nodes can carry metadata (`@key: value`) for tooling and runtime queries:
 
 ```flow
-<<WITH_METADATA>>:
-  @tags: combat, important
+<<ARMOURY>>:
+  @tags: combat, equipment
   @author: Filipe
   @priority: 1
   ---
-  Rita: This node has metadata.
+  Rita: Grab a weapon.
   EOD
-
-<<NATURAL_END>>:
-  @tags: a, b
-  @when: mood > 5
-  Bob: This ends naturally — no --- needed.
-  EOD: EOD
 ```
 
-Use `---` to separate metadata from body content. If the body starts with a non-metadata line, `---` is optional — the body begins at the first non-`@` line. Metadata can be queried at runtime using [Find Queries](#find-queries).
+Use `---` to separate metadata from body content. If the body starts with a non-`@` line, `---` is optional. Metadata is queryable at runtime with Find Queries.
+
+See [Node Metadata](/guide/metadata) for full details.
 
 ---
 
@@ -66,9 +62,9 @@ Use `->` to jump to another root node in the same file:
 <<MENU>>:
   Rita: What now?
   OPTIONS:
-    - Continue:
+    Continue:
       ->CHAPTER_2
-    - Quit:
+    Quit:
       EOD
 ```
 
@@ -97,27 +93,12 @@ You can also use the block syntax as a jump: `<<ROOT_NAME>>` on its own line.
 Jump to a node by querying its metadata at runtime:
 
 ```flow
-<<START>>:
-  Rita: Let's find a combat scene!
-  -> find(@tag CONTAINS "combat")
-  EOD
-
-<<SCENE_A>>:
-  @tag: combat, action
-  @zone: forest
-  ---
-  Alice: You're in the forest combat area!
-  EOD
-
-<<SCENE_B>>:
-  @tag: peaceful, exploration
-  @zone: forest
-  ---
-  Bob: The peaceful forest path.
-  EOD
+-> find(@tag CONTAINS "combat")
 ```
 
-The first node whose metadata matches the query is selected as the jump target. The query uses the same expression evaluator as conditions — supports `==`, `!=`, `<`, `>`, `CONTAINS`, and logical operators.
+The first matching node is selected. Queries support `==`, `!=`, `<`, `>`, `CONTAINS`, `&&`, `||`.
+
+See [Find Queries](/guide/find-queries) for full details.
 
 ### Tunnel — jump and return
 
@@ -168,26 +149,26 @@ Waypoints are named jump targets **within** a root node. Use them to mark specif
 | Token | Behaviour |
 |-------|-----------|
 | `::name` | Declare a waypoint at the current position |
-| `->name` | Jump to a waypoint in the current root (checked before root nodes) |
-| `->ROOT:name` | Jump to a waypoint in a different root, same file |
-| `->file.ROOT:name` | Jump to a waypoint in a different file |
+| `->name` | Jump to a waypoint in the current root (checked before any root node) |
+| `->ROOT|name` | Jump to a waypoint in a different root, same file |
+| `->file.ROOT|name` | Jump to a waypoint in a different file |
 
 ```flow
 <<LOOP_EXAMPLE>>:
   Guard: Let's start over from the top.
-  ->INTERROGATION:retry
+  ->INTERROGATION|retry
   EOD: EOD
 ```
 
 ### Cross-file waypoints
 
-Dot notation works for waypoints too — reference the file prefix, root name, and waypoint:
+Dot notation for the file, pipe for the waypoint:
 
 ```flow
-#include guards.flow
+#INCLUDE guards.flow
 
 <<START>>:
-  ->guards.INTERROGATION:retry
+  ->guards.GUARD_POST|retry
   EOD
 ```
 
@@ -199,13 +180,13 @@ Present the player with a set of options using `OPTIONS:` (also: `CHOICES:`, `BR
 
 ```flow
 OPTIONS:
-  - Ask about the mission:
+  Ask about the mission:
     Rita: It's dangerous, but necessary.
     <
-  - Ask about herself:
+  Ask about herself:
     Rita: That's none of your business.
     <
-  - Leave:
+  Leave:
     EOD
 ```
 
@@ -220,13 +201,13 @@ OPTIONS:
 
 ```flow
 OPTIONS:
-  - Tell the truth:
+  Tell the truth:
     Rita: I appreciate the honesty.
-  - *Lie:
+  *Lie:
     Rita: I know you're lying.
-  - #SecretPath:
+  #SecretPath:
     Rita: How did you know about that?
-  - SILENCE:
+  SILENCE:
     Rita: Nothing to say?
 ```
 
@@ -236,11 +217,11 @@ Add a time limit in seconds with `|`:
 
 ```flow
 OPTIONS|5.0:
-  - Grab the key:
+  Grab the key:
     Rita: Just in time!
-  - Run:
+  Run:
     John: Smart move.
-  - SILENCE:
+  SILENCE:
     Rita: You froze. The moment passed.
 ```
 
@@ -254,13 +235,13 @@ OPTIONS|5.0:
 
 ```flow
 OPTIONS:
-  - Ask about the weather:
+  Ask about the weather:
     Rita: Terrible, as usual.
     <
-  - Ask about the war:
+  Ask about the war:
     John: I don't talk about that.
     <
-  - Leave:
+  Leave:
     EOD
 ```
 
@@ -278,11 +259,11 @@ Options and sequence branches can include an inline `[[if condition]]` in the la
 <<OPTIONS_TEST>>:
   Rita: Choose an option.
   ?:
-    - Friendly [[if $mood > 5]]:
+    Friendly [[if $mood > 5]]:
       Rita: Good to see you!
-    - Neutral [[if $mood > 0]]:
+    Neutral [[if $mood > 0]]:
       Rita: Hello.
-    - Hostile [[if $mood <= 0]]:
+    Hostile [[if $mood <= 0]]:
       Rita: What do you want?
   SET mood = 3
   EOD: EOD
@@ -293,23 +274,23 @@ For `OPTIONS`/`?`, the filtering happens at parse time (once per dialogue start)
 ```flow
 <<RANDOM_TEST>>:
   RANDOM:
-    - Greeting [[if $mood > 5]]:
+    Greeting [[if $mood > 5]]:
       Rita: Great to see you!
-    - Neutral [[if $mood > 0]]:
+    Neutral [[if $mood > 0]]:
       Rita: Hello.
-    - Grumpy [[if $mood <= 0]]:
+    Grumpy [[if $mood <= 0]]:
       Rita: ...hi.
   EOD: EOD
 
 <<CYCLE_TEST>>:
   CYCLE:
-    - Morning [[if $time == "morning"]]:
+    Morning [[if $time == "morning"]]:
       Rita: Good morning!
-    - Afternoon [[if $time == "afternoon"]]:
+    Afternoon [[if $time == "afternoon"]]:
       Rita: Good afternoon.
-    - Evening [[if $time == "evening"]]:
+    Evening [[if $time == "evening"]]:
       Rita: Good evening.
-    - AnyTime:
+    AnyTime:
       Rita: Hello there.
   EOD: EOD
 ```
@@ -370,9 +351,9 @@ Branches can contain any valid content — choices, conditions, sequences, and n
       Rita: I get new stock every few days.
     2:
       RANDOM:
-        - WelcomeBack1:
+        WelcomeBack1:
           Rita: Back already?
-        - WelcomeBack2:
+        WelcomeBack2:
           Rita: Good timing — just restocked.
     +:
       Rita: What can I do for you?
@@ -473,10 +454,10 @@ Await can also be used for simple time delays without needing platform events:
 
 ```flow
 SIMULTANEOUS:
-  - MainTrack:
+  MainTrack:
     Rita: Keep moving, we're almost there.
     John: I can hear them behind us.
-  - Ambience:
+  Ambience:
     > Rain hammers the rooftop.
     > Somewhere below, glass breaks.
 ```
@@ -493,9 +474,9 @@ Use `END_INTERRUPTION` (or `^-`) to end a SIMULTANEOUS branch early:
 <<INTERRUPTION_TEST>>:
   John: I was going to say—
   SIMULTANEOUS:
-    - Main:
+    Main:
       John: Actually, never mind.
-    - Side:
+    Side:
       Rita: Wait, finish your thought.
       END_INTERRUPTION
   EOD: EOD
@@ -657,7 +638,7 @@ Commands can appear anywhere in the line — before, after, or inline with text.
 IGNORE:
   Rita: This whole block is skipped.
   OPTIONS:
-    - This too:
+    This too:
       John: All of it.
 ```
 

@@ -21,9 +21,9 @@ Picks one branch at random each time it is reached. Can repeat — the same bran
 
 ```flow
 RANDOM:
-  - Rita: Careful out there.
-  - Rita: Stay sharp.
-  - Rita: Don't do anything I wouldn't do.
+  Rita: Careful out there.
+  Rita: Stay sharp.
+  Rita: Don't do anything I wouldn't do.
 ```
 
 ### Weighted RANDOM
@@ -32,11 +32,11 @@ Append `|N` to a branch label to give it a higher probability. Default weight is
 
 ```flow
 RANDOM:
-  - Common|3:
+  Common|3:
     Rita: Careful out there.
-  - Uncommon:
+  Uncommon:
     Rita: Stay sharp.
-  - Rare:
+  Rare:
     Rita: Don't do anything I wouldn't do.
 ```
 
@@ -54,10 +54,10 @@ Like RANDOM, but non-repeating. Draws from a shuffled deck of all branches. Once
 
 ```flow
 SHUFFLE:
-  - John: I heard something in the east wing last night.
-  - John: The generator's been acting up again.
-  - John: Don't trust the new arrivals.
-  - John: Have you spoken to Rita lately?
+  John: I heard something in the east wing last night.
+  John: The generator's been acting up again.
+  John: Don't trust the new arrivals.
+  John: Have you spoken to Rita lately?
 ```
 
 The player will hear all four lines before any repeats.
@@ -74,9 +74,9 @@ Cycles through its branches in order, round-robin. The first visit plays branch 
 
 ```flow
 CYCLE:
-  - Rita: Morning.
-  - Rita: Good afternoon.
-  - Rita: Evening again already?
+  Rita: Morning.
+  Rita: Good afternoon.
+  Rita: Evening again already?
 ```
 
 ::: tip When to use CYCLE
@@ -112,9 +112,9 @@ The content inside `ONCE` can be anything, including choices:
 ONCE:
   John: One last thing — do you know how the vault works?
   OPTIONS:
-    - Yes, I've done this before:
+    Yes, I've done this before:
       John: Good. Then you know what to expect.
-    - No, explain it to me:
+    No, explain it to me:
       John: Alright, listen carefully...
       ->VAULT_TUTORIAL
 ```
@@ -130,9 +130,9 @@ Sequences can be nested or combined in a single conversation:
   ONCE:
     John: New around here?
   SHUFFLE:
-    - John: Quiet day.
-    - John: Eyes open.
-    - John: Move along.
+    John: Quiet day.
+    John: Eyes open.
+    John: Move along.
   EOD
 ```
 
