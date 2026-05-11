@@ -54,12 +54,19 @@
 
 ---
 
+## Node metadata
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `@when` | Expression | Condition evaluated during `find()`. Excludes node if false. |
+| `@priority` | Integer | Numeric priority, queryable from `find()`. |
+
 ## Choice option modifiers
 
 | Prefix | Meaning |
 |--------|---------|
 | *(none)* | Normal selectable option |
-| `*` | Locked — visible but not selectable |
+| `*` | **Single-use** — selectable once, then hidden. Uses `this.chosen` internally. |
 | `#` | Hidden — not shown in the choice list |
 | `SILENCE` | Silent hidden option — plays when no choice is made (timed) |
 
@@ -96,3 +103,9 @@ Applied to `OPTIONS` with pipe separators: `OPTIONS|time|flag|flag`
 | `{a ? b \| c}` | Inline ternary expression |
 | `{A \| B \| C}` | Inline random pick |
 | `Label\|N` | Weighted RANDOM branch label with weight N |
+
+## Special variables
+
+| Variable | Description |
+|----------|-------------|
+| `this.chosen` | Tracks how many times an option has been selected. Used internally by `*` single-use options. Available in `[[if this.chosen == 0]]` conditions. |

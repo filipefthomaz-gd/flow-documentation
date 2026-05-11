@@ -44,7 +44,22 @@ Nodes can carry metadata for tooling, runtime queries, and documentation. Metada
 <<METADATA_ONLY>>:
   @tags: justTags
   EOD
+
+<<CONDITIONAL_NODE>>:
+  @tag: boss
+  @when: $player_level >= 5
+  @priority: 10
+  ---
+  Boss: You shouldn't be here.
+  EOD
 ```
+
+Special metadata keys:
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `@when` | Expression | Condition evaluated during `find()`. Removed from Metadata dict. |
+| `@priority` | Integer | Numeric priority. Stays in Metadata for querying. |
 
 Use `---` to separate metadata from the body. If the body starts with a non-metadata line, `---` is optional — the body begins at the first non-`@` line.
 
@@ -92,6 +107,8 @@ Jump to a node matching a metadata query:
 ```
 
 The first node whose metadata matches the query is selected. Queries use the same expression evaluator as conditions.
+
+Nodes with an `@when` metadata key are pre-filtered automatically — if the `@when` expression evaluates to false against the current variable storage, the node is excluded from query results.
 
 ---
 
@@ -203,9 +220,9 @@ OPTIONS:
   Ask about the mission:
     Rita: It's dangerous, but necessary.
     <
-  *Locked option:
-    Rita: You can't ask that yet.
-  #HiddenOption:
+  *Ask about the quest:
+    Rita: I already told you everything.
+  #SecretPath:
     Rita: How did you know to ask that?
   SILENCE:
     John: Nothing to say, huh.
@@ -218,9 +235,13 @@ Also accepted: `CHOICES:`, `BRANCHING:`, `?:`
 | Prefix | Behaviour |
 |--------|-----------|
 | *(none)* | Normal selectable option |
-| `*` | Locked — visible but not selectable |
+| `*` | **Single-use** — selectable once, then automatically hidden |
 | `#` | Hidden — not shown in the list |
 | `SILENCE` | Silent hidden option — selected when player doesn't choose |
+
+::: tip this.chosen
+Single-use options (`*`) work by injecting `[[if this.chosen == 0]]` internally. You can reference `this.chosen` directly in your own `[[if]]` conditions for finer control.
+::: 
 
 ### Timed choices
 

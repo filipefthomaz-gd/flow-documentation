@@ -48,9 +48,26 @@ Nodes can carry metadata (`@key: value`) for tooling and runtime queries:
   EOD
 ```
 
-Use `---` to separate metadata from body content. If the body starts with a non-`@` line, `---` is optional. Metadata is queryable at runtime with Find Queries.
+Flow recognizes two special metadata keys:
 
-See [Node Metadata](/guide/metadata) for full details.
+| Key | Purpose |
+|-----|---------|
+| `@when: expression` | Condition evaluated during `find()` — node is excluded if false |
+| `@priority: N` | Numeric priority for selection strategies and querying |
+
+```flow
+<<BOSS_FIGHT>>:
+  @tag: combat, boss
+  @when: $player_level >= 5
+  @priority: 10
+  ---
+  Charlie: The dragon awakens!
+  EOD
+```
+
+Use `---` to separate metadata from body content. If the body starts with a non-`@` line, `---` is optional.
+
+See [Node Metadata](/guide/metadata) and [Find Queries](/guide/find-queries) for full details.
 
 ---
 
@@ -97,6 +114,12 @@ Jump to a node by querying its metadata at runtime:
 ```
 
 The first matching node is selected. Queries support `==`, `!=`, `<`, `>`, `CONTAINS`, `&&`, `||`.
+
+Nodes with an `@when` condition are automatically filtered — if the condition fails against the current game state, the node is excluded from results:
+
+```flow
+-> find(@tag CONTAINS "combat" && @priority > 0)
+```
 
 See [Find Queries](/guide/find-queries) for full details.
 
@@ -195,7 +218,7 @@ OPTIONS:
 | Prefix | Behaviour |
 |--------|-----------|
 | *(none)* | Normal selectable option |
-| `*` | **Locked** — visible but not selectable |
+| `*` | **Single-use** — selectable once, then automatically hidden |
 | `#` | **Hidden** — not shown in the list |
 | `SILENCE` | A silent hidden option (selected when player says nothing) |
 
@@ -203,13 +226,43 @@ OPTIONS:
 OPTIONS:
   Tell the truth:
     Rita: I appreciate the honesty.
-  *Lie:
-    Rita: I know you're lying.
+  *Ask about the quest:
+    Rita: I've told you everything I know.
   #SecretPath:
     Rita: How did you know about that?
   SILENCE:
     Rita: Nothing to say?
 ```
+
+### Single-use options
+
+The `*` prefix marks an option as **single-use** — it can be selected once, and on subsequent encounters it is automatically hidden:
+
+```flow
+<<SHOP>>:
+  Rita: What can I do for you?
+  ?:
+    *Ask about the discount:
+      Rita: You already used that favour.
+    Buy a potion:
+      Rita: Good choice.
+    Leave:
+      EOD
+```
+
+Internally, `*` adds an `[[if this.chosen == 0]]` condition to the option. The `this.chosen` variable tracks how many times the option has been selected across the session, using a storage key derived from the node and option IDs.
+
+You can also use `this.chosen` directly in your own `[[if]]` conditions:
+
+```flow
+?:
+  Flirt [[if this.chosen < 3]]:
+    Rita: You're persistent, I'll give you that.
+  Insult:
+    Rita: Not interested.
+```
+
+This gives you fine-grained control over option availability beyond single-use semantics.
 
 ### Timed choices
 

@@ -42,17 +42,62 @@ A single key can hold multiple values separated by commas:
 
 Values are stored as lists. Find queries can use `CONTAINS` to check membership.
 
+## Special metadata keys
+
+Some metadata keys have built-in semantics in Flow:
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `@when` | Expression | Condition evaluated automatically during `find()` queries. If the condition is false, the node is excluded from results. Removed from the generic Metadata dictionary — not queryable via `@key` substitution. |
+| `@priority` | Integer | Numeric priority for disambiguating between eligible nodes. Stored as a typed `int` field for programmatic use and also kept in Metadata so it can be queried: `find(@priority > 5)`. |
+
+### @when — node condition
+
+The `@when` expression is evaluated against the runtime's variable storage — the same evaluator used for `[[if ...]]` conditions:
+
+```flow
+<<FOREST_AMBUSH>>:
+  @tag: combat
+  @when: $player_level > 3
+  @priority: 10
+  ---
+  Alice: Goblins ambush you in the forest!
+  EOD
+```
+
+Multiple `@when` lines are AND-joined automatically:
+
+```flow
+<<BOSS_FIGHT>>:
+  @tag: combat, boss
+  @when: $has_sword == true
+  @when: $player_level >= 5
+  ---
+  Charlie: The dragon awakens!
+  EOD
+```
+
+If the condition fails, the node is invisible to `find()` — it won't match any query.
+
+### @priority — selection weight
+
+`@priority` stores an integer that can be queried from `find()` and used by future selection strategies (e.g., "prefer higher priority"). For now it is stored and queryable:
+
+```flow
+-> find(@tag CONTAINS "boss" && @priority > 5)
+```
+
 ## What metadata is for
 
 | Use | Description |
 |-----|-------------|
 | **Find Queries** | Runtime jump to a node matching criteria — `-> find(@tag CONTAINS "combat")` |
-| **Documentation** | Author, priority, notes — any info about the node |
+| **Documentation** | Author, notes — any info about the node |
 | **Tooling** | Editor extensions, linting, and analysis can read metadata |
 
 ## In the runtime
 
-Metadata is exposed on `DialogueRootNode` as a `Dictionary<string, List<string>>`. Your game can inspect it when a node starts:
+Metadata is exposed on `DialogueRootNode` as a `Dictionary<string, List<string>>`, plus typed `Condition` and `Priority` fields for the special keys:
 
 ```csharp
 runner.OnNodeStarted += nodeData =>
@@ -60,12 +105,19 @@ runner.OnNodeStarted += nodeData =>
     var rootNode = runner.Graph.Nodes.Values
         .OfType<DialogueRootNode>()
         .FirstOrDefault(n => n.NodeID.rootNode == nodeData.currentNode);
-    
+
+    // Generic metadata — includes @priority, @tags, etc.
     if (rootNode?.Metadata.TryGetValue("tags", out var tags) == true)
     {
         foreach (var tag in tags)
             Analytics.Tag($"scene_{tag}");
     }
+
+    // Typed fields for special keys
+    if (rootNode?.Priority > 5)
+        Analytics.Tag("high_priority_scene");
+
+    // @when is evaluated automatically during find() — not available here
 };
 ```
 
