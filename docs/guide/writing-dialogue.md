@@ -52,13 +52,13 @@ Flow recognizes two special metadata keys:
 
 | Key | Purpose |
 |-----|---------|
-| `@when: expression` | Condition evaluated during `find()` — node is excluded if false |
+| `@requires: expression` | Condition evaluated during `find()` — node is excluded if false |
 | `@priority: N` | Numeric priority for selection strategies and querying |
 
 ```flow
 <<BOSS_FIGHT>>:
   @tag: combat, boss
-  @when: $player_level >= 5
+  @requires: $player_level >= 5
   @priority: 10
   ---
   Charlie: The dragon awakens!
@@ -115,7 +115,7 @@ Jump to a node by querying its metadata at runtime:
 
 The first matching node is selected. Queries support `==`, `!=`, `<`, `>`, `CONTAINS`, `&&`, `||`.
 
-Nodes with an `@when` condition are automatically filtered — if the condition fails against the current game state, the node is excluded from results:
+Nodes with an `@requires` condition are automatically filtered — if the condition fails against the current game state, the node is excluded from results:
 
 ```flow
 -> find(@tag CONTAINS "combat" && @priority > 0)

@@ -26,7 +26,7 @@ Use `---` to separate metadata from the body. The `---` is optional if the body 
 
 <<NATURAL_END>>:
   @tags: a, b
-  @when: mood > 5
+  @requires: mood > 5
   Bob: This ends naturally — no --- needed.
   EOD
 ```
@@ -48,30 +48,30 @@ Some metadata keys have built-in semantics in Flow:
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `@when` | Expression | Condition evaluated automatically during `find()` queries. If the condition is false, the node is excluded from results. Removed from the generic Metadata dictionary — not queryable via `@key` substitution. |
+| `@requires` | Expression | Condition evaluated automatically during `find()` queries. If the condition is false, the node is excluded from results. Removed from the generic Metadata dictionary — not queryable via `@key` substitution. |
 | `@priority` | Integer | Numeric priority for disambiguating between eligible nodes. Stored as a typed `int` field for programmatic use and also kept in Metadata so it can be queried: `find(@priority > 5)`. |
 
-### @when — node condition
+### @requires — node condition
 
-The `@when` expression is evaluated against the runtime's variable storage — the same evaluator used for `[[if ...]]` conditions:
+The `@requires` expression is evaluated against the runtime's variable storage — the same evaluator used for `[[if ...]]` conditions:
 
 ```flow
 <<FOREST_AMBUSH>>:
   @tag: combat
-  @when: $player_level > 3
+  @requires: $player_level > 3
   @priority: 10
   ---
   Alice: Goblins ambush you in the forest!
   EOD
 ```
 
-Multiple `@when` lines are AND-joined automatically:
+Multiple `@requires` lines are AND-joined automatically:
 
 ```flow
 <<BOSS_FIGHT>>:
   @tag: combat, boss
-  @when: $has_sword == true
-  @when: $player_level >= 5
+  @requires: $has_sword == true
+  @requires: $player_level >= 5
   ---
   Charlie: The dragon awakens!
   EOD
@@ -117,7 +117,7 @@ runner.OnNodeStarted += nodeData =>
     if (rootNode?.Priority > 5)
         Analytics.Tag("high_priority_scene");
 
-    // @when is evaluated automatically during find() — not available here
+    // @requires is evaluated automatically during find() — not available here
 };
 ```
 

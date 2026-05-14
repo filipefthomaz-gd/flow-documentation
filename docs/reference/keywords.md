@@ -58,7 +58,7 @@
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `@when` | Expression | Condition evaluated during `find()`. Excludes node if false. |
+| `@requires` | Expression | Condition evaluated during `find()`. Excludes node if false. |
 | `@priority` | Integer | Numeric priority, queryable from `find()`. |
 
 ## Choice option modifiers

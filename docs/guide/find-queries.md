@@ -64,9 +64,9 @@ You can combine multiple operators for precise targeting:
 -> find(@tag CONTAINS "combat" && @priority > 0 && @zone != "castle")
 ```
 
-## Node conditions with @when
+## Node conditions with @requires
 
-If a root node has an `@when` condition, it is evaluated automatically during every `find()` query. Nodes whose conditions fail are excluded — even if their metadata matches the query:
+If a root node has an `@requires` condition, it is evaluated automatically during every `find()` query. Nodes whose conditions fail are excluded — even if their metadata matches the query:
 
 ```flow
 <<PICK_SCENE>>:
@@ -76,7 +76,7 @@ If a root node has an `@when` condition, it is evaluated automatically during ev
 <<FOREST_FIGHT>>:
   @tag: combat
   @zone: forest
-  @when: $player_level > 3
+  @requires: $player_level > 3
   @priority: 5
   ---
   Alice: Goblins ambush you!
@@ -85,18 +85,18 @@ If a root node has an `@when` condition, it is evaluated automatically during ev
 <<BOSS_FIGHT>>:
   @tag: combat
   @zone: castle
-  @when: $player_level >= 10
+  @requires: $player_level >= 10
   @priority: 10
   ---
   Charlie: The dragon awakens!
   EOD
 ```
 
-At `player_level = 7`, only `FOREST_FIGHT` matches: `BOSS_FIGHT` is excluded by its `@when` condition. Node conditions use the same expression evaluator as `[[if ...]]` and run against the runtime's variable storage.
+At `player_level = 7`, only `FOREST_FIGHT` matches: `BOSS_FIGHT` is excluded by its `@requires` condition. Node conditions use the same expression evaluator as `[[if ...]]` and run against the runtime's variable storage.
 
 ## Multiple matches
 
-If more than one node matches (passes both `@when` and the query), one is selected at random. This makes find queries useful for ambient, barks, and procedural content:
+If more than one node matches (passes both `@requires` and the query), one is selected at random. This makes find queries useful for ambient, barks, and procedural content:
 
 ```flow
 @tag: ambient_greeting
