@@ -94,50 +94,54 @@ If a root node has an `@requires` condition, it is evaluated automatically durin
 
 At `player_level = 7`, only `FOREST_FIGHT` matches: `BOSS_FIGHT` is excluded by its `@requires` condition. Node conditions use the same expression evaluator as `[[if ...]]` and run against the runtime's variable storage.
 
-## Multiple matches
+## Multiple matches and selection strategies
 
-If more than one node matches (passes both `@requires` and the query), one is selected at random. This makes find queries useful for ambient, barks, and procedural content:
+When more than one node matches, the runtime applies a **selection strategy** to pick one. The default strategy is `BestLeastRecentlyViewed`, which mirrors Yarn Spinner's saliency system:
 
-```flow
-@tag: ambient_greeting
-@mood: neutral
----
-Guard: Morning.
+1. Highest `@priority` wins
+2. Most `@requires` conditions wins (specificity)
+3. Least recently selected wins (recency)
+4. Random tiebreak
 
-@tag: ambient_greeting
-@mood: neutral
----
-Guard: Another day, another patrol.
-
-@tag: ambient_greeting
-@mood: neutral
----
-Guard: You're up early.
-```
-
-## With priority
-
-Use `@priority` as a queryable axis for finer targeting:
+Override the strategy per-call by appending `| strategyName` inside the `find()`:
 
 ```flow
--> find(@tag CONTAINS "combat" && @priority > 0 && @zone != "castle")
+-> find(@tag CONTAINS "combat")                         // default strategy
+-> find(@tag CONTAINS "combat" | random)                // equal probability
+-> find(@tag CONTAINS "combat" | best)                  // highest @priority only
+-> find(@tag CONTAINS "combat" | weighted)              // probability proportional to @priority
+-> find(@tag CONTAINS "combat" | recency)               // least recently selected
+-> find(@tag CONTAINS "combat" | specific)              // most @requires conditions
 ```
 
-`@priority` is also available as a typed `int` field on `DialogueRootNode.Priority`, making it ready for future selection strategies (e.g., priority-weighted selection).
+| Strategy | Behaviour |
+|----------|-----------|
+| `default` | Priority → Specificity → Recency → Random (recommended) |
+| `best` | Highest `@priority`; random tiebreak |
+| `weighted` | Probability proportional to `@priority` (floor 1) |
+| `recency` | Least recently selected; random tiebreak |
+| `specific` | Most `@requires` conditions; random tiebreak |
+| `random` | Equal probability — no weighting |
 
-Note: find queries currently select uniformly from matches. Use weighted `RANDOM` inside the matched node for weighted variation.
+The runtime tracks how many times each node has been selected in a play session. The `recency` and `default` strategies use this to spread selection across the pool.
+
+## As a tunnel
+
+A find query can be used as a tunnel — it jumps to the selected node and returns when it ends:
+
+```flow
+-> find(@tag CONTAINS "ambient_bark") <-
+Rita: Anyway, where were we?
+```
+
+This is the recommended pattern for barks: a short scene plays and execution returns to the next line automatically. See [Tunnel](/guide/tunnel) for the return mechanic.
 
 ## In the runtime
 
-The find query is executed by `DialogueRootChangeNode` when it's reached during traversal. It evaluates the expression against every `DialogueRootNode` in the graph, filters by matching metadata, and picks one at random from the results.
-
-```csharp
-// The query @tag CONTAINS "combat" is expanded to check each node's metadata:
-//   root.Metadata["tag"] contains "combat"
-```
+The find query is executed when the node is reached during traversal. It evaluates the expression against every `DialogueRootNode` in the graph, filters by `@requires` and metadata match, and applies the selection strategy.
 
 ## See also
 
 - [Node Metadata](/guide/metadata) — how to tag nodes
-- [Writing Dialogue — Find Queries](/guide/writing-dialogue#find-queries) — quick syntax reference
-- [Syntax — Find Queries](/reference/syntax#find-queries) — reference
+- [Storylets](/guide/storylets) — full guide to the storylet pattern and strategy configuration
+- [Tunnel](/guide/tunnel) — how `-> find(...) <-` returns after the selected node ends

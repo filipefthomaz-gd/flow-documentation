@@ -15,26 +15,26 @@ hero:
 
 features:
   - icon: ✍️
-    title: Writer-friendly syntax
-    details: Readable, indentation-based plain text. No XML, no JSON, no boilerplate. Writers can read and edit files without touching code.
-
-  - icon: 🎮
-    title: Game-first design
-    details: Simultaneous tracks, interruptions, timed choices, narration — all first-class citizens. Not afterthoughts bolted onto a writing tool.
+    title: Plain text, plain readable
+    details: <code>SpeakerName: line text</code> is all it takes. Files are readable without tooling, editable in any text editor, and version-controlled like code. No XML, no JSON, no graph editor required.
 
   - icon: 🔀
-    title: Rich branching
-    details: Player choices, conditions, random picks, ONCE/CYCLE/SHUFFLE sequences, and weighted variants — with state managed automatically.
+    title: Choices and conditions
+    details: <code>OPTIONS:</code> presents player choices. <code>IF</code> / <code>ELSE IF</code> / <code>ELSE</code> branches on runtime conditions. Options can be locked, timed, or conditional inline — without extra syntax.
 
-  - icon: 🧩
-    title: Modular files
-    details: Split dialogue across multiple files with <code>#INCLUDE</code>. Build libraries of characters, quests, and scenes that compose cleanly.
+  - icon: 🎲
+    title: Automatic sequence nodes
+    details: <code>RANDOM</code>, <code>SHUFFLE</code>, <code>CYCLE</code>, and <code>ONCE</code> pick branches without player input. State is persisted automatically — ONCE plays once per session, SHUFFLE never repeats until the pool is exhausted.
+
+  - icon: ↩️
+    title: Tunnels
+    details: <code>-> SECTION &lt;-</code> calls any root node as a subroutine and returns automatically when it ends. Reuse greetings, barks, and cutscenes from multiple places without duplicating content.
 
   - icon: ⚡
-    title: VS Code extension
-    details: Full editor support — syntax highlighting, completions, diagnostics, Go to Definition, and an interactive in-editor dialogue player.
+    title: Parallel dialogue tracks
+    details: <code>PARALLEL</code> starts an independent track alongside the main dialogue. <code>AWAIT</code> holds the master until a condition or EOD resolves — for background music, ambient NPC lines, and event-driven sequences.
 
-  - icon: 🤖
-    title: AI-ready architecture
-    details: Pluggable variable storage, extensible command system, and adaptive line pools designed to support LLM integration without changing authored content.
+  - icon: 🔍
+    title: Storylet queries
+    details: <code>-> find(@tag CONTAINS "combat" | weighted)</code> selects a node at runtime by metadata query. Pluggable strategies — priority, recency, specificity, weighted random — make content-driven selection as simple as writing a tag.
 ---

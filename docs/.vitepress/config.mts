@@ -40,6 +40,7 @@ export default defineConfig({
           { text: 'Parallel Tracks',   link: '/guide/parallel-tracks' },
           { text: 'Node Metadata',     link: '/guide/metadata' },
           { text: 'Find Queries',      link: '/guide/find-queries' },
+          { text: 'Storylets',         link: '/guide/storylets' },
           { text: 'Variables',         link: '/guide/variables' },
           { text: 'VS Code Features',  link: '/guide/vscode-features' },
         ],

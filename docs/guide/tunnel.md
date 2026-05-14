@@ -115,3 +115,19 @@ Execution returns correctly through each level.
 ::: tip When to use tunnels
 Tunnels are ideal for reusable sections — greetings, short barks, shared cutscenes — that can be called from multiple places without duplicating content. Any section that ends with `EOD` can be used as a tunnel target.
 :::
+
+---
+
+## Tunnel to a find query
+
+The tunnel target can be a `find()` expression rather than a fixed node name. The runtime selects a matching node and returns after it ends:
+
+```flow
+<<MAIN_SCENE>>:
+  Rita: Let me find someone for you to talk to.
+  -> find(@tag CONTAINS "ambient_npc") <-
+  Rita: Anyway. Where were we?
+  EOD
+```
+
+This is the recommended pattern for barks: a pool of tagged scenes, selected by the runtime using the current strategy, playing as a subroutine. See [Storylets](/guide/storylets) for how to set up tagged scenes and configure selection strategies.
