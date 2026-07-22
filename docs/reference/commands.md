@@ -62,13 +62,12 @@ Use `SET` and `#` for standalone commands that aren't part of spoken text. They 
 
 ## Built-in commands
 
+The Flow library itself ships exactly two commands — everything else is bring-your-own:
+
 | Command | Example | When it runs |
 |---------|---------|-------------|
-| `audio` | `[[audio sfx_gunshot]]` | Line delivery start |
 | `set` | `[[set reputation = 1]]` | Parse time |
-| `tag` | `[[tag important]]` | Parse time |
 | `if` | `[[if reputation >= 2]]` | Parse time — controls `canBeParsed` |
-| `emotion` | `[[emotion sad]]` | Line delivery start |
 
 ::: info `if` and canBeParsed
 The `[[if ...]]` command controls whether a line or choice option is shown. If the condition is false, `canBeParsed` is set to `false` and the node is skipped. This is how conditional choices work internally.
@@ -78,15 +77,15 @@ The `[[if ...]]` command controls whether a line or choice option is shown. If t
 
 ## Custom commands
 
-Any `[[KEY value]]` pair is valid. Unrecognised commands are passed through to the game runtime as-is:
+Any other `[[KEY value]]` pair is valid syntax — Flow strips it from the displayed text and hands it to your game as a `DialogueLineCommand` with `key` and `data` fields. What happens next (playing audio, triggering an animation, shaking the camera) is entirely up to your integration:
 
 ```flow
+Rita: Let's move. [[audio footsteps_run]] [[tag urgent]]
 John: Watch out! [[vfx explosion]] [[camera_shake 0.3]]
 Rita: The door is locked. [[highlight door_object]]
-John: Halt! [[spawn_unit reinforcement_01]]
 ```
 
-The runtime receives a `DialogueLineCommand` with `key` and `data` fields for each command on the line.
+`audio`, `tag`, `vfx`, `camera_shake`, `emotion`, and similar are not part of Flow — they're conventions an integration defines by implementing `IDialogueCommand` for each key it wants to handle. Unrecognized commands are simply passed through; nothing breaks if your runtime doesn't implement a given key.
 
 ---
 

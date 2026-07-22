@@ -81,7 +81,7 @@ If the condition fails, the node is invisible to `find()` — it won't match any
 
 ### @priority — selection weight
 
-`@priority` stores an integer that can be queried from `find()` and used by future selection strategies (e.g., "prefer higher priority"). For now it is stored and queryable:
+`@priority` stores an integer that's queryable from `find()` and drives the built-in selection strategies (`best`, `weighted`, and the `default` strategy's top tier — see [Storylets](/guide/storylets)):
 
 ```flow
 -> find(@tag CONTAINS "boss" && @priority > 5)
@@ -100,11 +100,11 @@ If the condition fails, the node is invisible to `find()` — it won't match any
 Metadata is exposed on `DialogueRootNode` as a `Dictionary<string, List<string>>`, plus typed `Condition` and `Priority` fields for the special keys:
 
 ```csharp
-runner.OnNodeStarted += nodeData =>
+runner.OnNodeReady += nodeData =>
 {
     var rootNode = runner.Graph.Nodes.Values
         .OfType<DialogueRootNode>()
-        .FirstOrDefault(n => n.NodeID.rootNode == nodeData.currentNode);
+        .FirstOrDefault(n => n.NodeID.rootNode == nodeData.nodeID.rootNode);
 
     // Generic metadata — includes @priority, @tags, etc.
     if (rootNode?.Metadata.TryGetValue("tags", out var tags) == true)

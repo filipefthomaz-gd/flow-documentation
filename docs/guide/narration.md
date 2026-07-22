@@ -108,36 +108,6 @@ John: Thank you, Rita.
 
 ### With choices
 
-```flow
-OPTIONS:
-  Open the door:
-    > The hinges groan. Whatever was in here hasn't moved in years.
-    Rita: Hello?
-  Walk away:
-    > You tell yourself you'll come back. You won't.
-    ->STREET
-```
-
-### Internal monologue
-
-```flow
-Rita: I'll look into it.
-> She won't. She already knows the answer.
-John: Thank you, Rita.
-```
-
-### Stage directions mixed with dialogue
-
-```flow
-<<CONFRONTATION>>:
-  > John turns slowly. He doesn't look surprised.
-  John: I wondered when you'd show up.
-  > He gestures to a chair. You don't sit.
-  John: Still stubborn. Good.
-```
-
-### With choices
-
 Narration works anywhere in the flow, including inside choice branches:
 
 ```flow

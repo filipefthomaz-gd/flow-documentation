@@ -20,6 +20,8 @@
 | `PAUSE` | Timed delay — `PAUSE: 1.5` pauses execution for the given number of seconds |
 | `AWAIT` | Suspend execution until a condition resolves — track EOD, external event, or function |
 | `IGNORE` | Skip this block entirely |
+| `find(query)` | Select a root node at runtime by metadata query — see [Find Queries](/guide/find-queries) |
+| `::name` / `WAYPOINT` | Declare a named jump target within the current root — see [Waypoints](/guide/writing-dialogue#waypoints) |
 
 ## Sequences
 
@@ -29,6 +31,7 @@
 | `SHUFFLE` | Pick at random, non-repeating until pool exhausted |
 | `CYCLE` | Pick in order, round-robin |
 | `ONCE` | Play once, silently skip on repeat |
+| `VISITS` | Branch by visit count (`1:`, `2:`, `3-5:`, `+:`) |
 
 ## Narration
 
@@ -95,7 +98,8 @@ Applied to `OPTIONS` with pipe separators: `OPTIONS|time|flag|flag`
 | `->NAME` | Jump to root `NAME` |
 | `->NAME<-` | Tunnel to root `NAME` and return (arrow form) |
 | `<<NAME>>` | Jump to root `NAME` (block syntax) |
-| `//` | Line comment |
+| `//` | Line comment — strips from `//` to end of line, wherever it appears |
+| `/* ... */` | Block comment — spans multiple lines |
 | `SET expr` | `[[set expr]]` — supports `=`, `+=`, `-=`, `*=`, `/=` |
 | `#CMD args` | `[[cmd args]]` |
 | `$Name` | CONST substitution — replaced at parse time |
@@ -103,6 +107,24 @@ Applied to `OPTIONS` with pipe separators: `OPTIONS|time|flag|flag`
 | `{a ? b \| c}` | Inline ternary expression |
 | `{A \| B \| C}` | Inline random pick |
 | `Label\|N` | Weighted RANDOM branch label with weight N |
+
+## Operators
+
+Used in `IF`/`ELSE IF`, `[[if ...]]`, `find()` queries, and inline `{...}` expressions — one shared evaluator.
+
+| Operator | Alternate form | Meaning |
+|----------|----------------|---------|
+| `==` | | Equal |
+| `!=` | | Not equal |
+| `<` `>` `<=` `>=` | | Numeric comparison |
+| `&&` | `and` | Logical AND |
+| `\|\|` | `or` | Logical OR |
+| `!` | `not` | Logical NOT |
+| `contains` | | Substring/membership check — `a contains b` |
+| `in` | | List membership — `a in [x, y, z]` |
+| `+` `-` `*` `/` | | Arithmetic (`+` also concatenates strings) |
+
+Keyword operators (`and`, `or`, `not`, `contains`, `in`) are case-insensitive.
 
 ## Special variables
 

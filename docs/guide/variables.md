@@ -178,6 +178,30 @@ TEMP hint_shown = false
   EOD
 ```
 
+## Lists
+
+A `VAR` or `TEMP` can hold a list of values, written as a bracketed, comma-separated literal:
+
+```flow
+VAR known_factions = ["rebels", "raiders"]
+VAR met_npcs = [rita, john]
+```
+
+Lists work with `contains`/`in` (see below) and with `SET`'s compound operators:
+
+```flow
+SET known_factions += "smugglers"   // append
+SET known_factions -= "raiders"     // remove the first matching element
+```
+
+Reading a list with `{braces}` renders it back in bracketed form (`["rebels", "smugglers"]`) — lists are meant for membership checks in conditions, not for display.
+
+::: info Element resolution differs by context
+Inside a list **literal written directly in a condition** (e.g. `faction in [alliedFaction, "raiders"]`), each element is evaluated as its own expression — an unquoted word looks up a variable, a quoted word is a literal. Once a list is **read back from storage** (a `VAR`/`TEMP` you declared, or the result of `SET += `), its elements are always treated as plain literal strings — no further variable lookup happens on read.
+:::
+
+---
+
 ## Inline expressions
 
 Anywhere `{braces}` appear in a line of text, the runtime evaluates the content:
@@ -219,7 +243,12 @@ Rita: That's {gold * 2} after the discount.
 John: Score: {kills + assists}.
 ```
 
-The expression evaluator supports full arithmetic (`+`, `-`, `*`, `/`), comparison (`==`, `!=`, `<`, `>`, `<=`, `>=`), logical (`&&`, `||`, `!` / `not`, `and`, `or`), and parentheses for grouping. Operator precedence follows standard rules.
+The expression evaluator supports full arithmetic (`+`, `-`, `*`, `/`), comparison (`==`, `!=`, `<`, `>`, `<=`, `>=`), logical (`&&`, `||`, `!` / `not`, `and`, `or`), membership (`contains`, `in`), and parentheses for grouping. Operator precedence follows standard rules. Keyword operators (`not`, `and`, `or`, `contains`, `in`) are case-insensitive.
+
+::: tip contains vs in
+- `a contains b` — if `a` is a [list](#lists), true when one of its elements equals `b` exactly. Otherwise, true if `b` appears as a substring of `a` — this is what makes tag membership work: `@tag contains "combat"`.
+- `a in [x, y, z]` — true if `a` equals one of the bracketed values exactly. Works the same whether the list is a literal or a stored variable: `faction in ["rebels", allyFaction]` or `faction in known_factions`.
+:::
 
 ::: tip String concatenation
 `+` between a string and any other type produces a string: `{"Part " + chapter}` gives `"Part 2"`.

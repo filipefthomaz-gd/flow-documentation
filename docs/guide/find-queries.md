@@ -52,9 +52,10 @@ When `-> find(@tag CONTAINS "combat")` executes, the runtime searches all root n
 | `>=` | `@priority >= 3` | Numeric greater or equal |
 | `<` | `@priority < 10` | Numeric less than |
 | `<=` | `@priority <= 5` | Numeric less or equal |
-| `CONTAINS` | `@tag CONTAINS "boss"` | Value is in the tag list |
-| `&&` | `@tag CONTAINS "combat" && @zone == "forest"` | Logical AND |
-| `\|\|` | `@zone == "forest" \|\| @zone == "cave"` | Logical OR |
+| `CONTAINS` | `@tag CONTAINS "boss"` | Value is in the tag list (case-insensitive; `contains` works too) |
+| `&&` | `@tag CONTAINS "combat" && @zone == "forest"` | Logical AND (`and` also works) |
+| `\|\|` | `@zone == "forest" \|\| @zone == "cave"` | Logical OR (`or` also works) |
+| `in` | `@zone in ["forest", "cave"]` | Value matches one of a bracketed list |
 
 ## Combined queries
 

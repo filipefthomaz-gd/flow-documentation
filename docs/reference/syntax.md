@@ -381,7 +381,7 @@ ELSE:
   John: We don't know you.
 ```
 
-`ELSE IF` and `ELSE` are optional. Operators: `==`, `!=`, `<`, `>`, `<=`, `>=`, `&&`, `||`, `!`.
+`ELSE IF` and `ELSE` are optional. Operators: `==`, `!=`, `<`, `>`, `<=`, `>=`, `&&`/`and`, `||`/`or`, `!`/`not`, `contains`, `in`. Keyword operators are case-insensitive.
 
 ---
 
@@ -420,6 +420,7 @@ Not available at runtime. Replaced literally in the file text before parsing.
 ```flow
 VAR reputation = 0
 VAR has_key = false
+VAR known_factions = ["rebels", "raiders"]   // list — see Variables guide
 ```
 
 Declare at the top level. Reference in dialogue with `{braces}`:
@@ -427,6 +428,8 @@ Declare at the top level. Reference in dialogue with `{braces}`:
 ```flow
 Rita: Your reputation is {reputation}.
 ```
+
+Lists support `contains`/`in` and `SET list += x` / `SET list -= x`. See [Variables — Lists](/guide/variables#lists).
 
 ### TEMP — session
 
@@ -510,7 +513,16 @@ Any `#WORD` line (other than `#INCLUDE`) is treated as a command shorthand.
 ## Comments
 
 ```flow
-// This line is ignored
+// This line is ignored — also strips a trailing // comment after real content
+```
+
+Block comments span multiple lines and are stripped before parsing:
+
+```flow
+/*
+  Everything in here is ignored, including
+  multiple lines of notes.
+*/
 ```
 
 ---
