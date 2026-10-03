@@ -42,6 +42,7 @@ export default defineConfig({
           { text: 'Find Queries',      link: '/guide/find-queries' },
           { text: 'Storylets',         link: '/guide/storylets' },
           { text: 'Variables',         link: '/guide/variables' },
+          { text: 'Line IDs',          link: '/guide/line-ids' },
           { text: 'VS Code Features',  link: '/guide/vscode-features' },
         ],
       },
